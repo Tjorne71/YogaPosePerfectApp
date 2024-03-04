@@ -1,4 +1,4 @@
-// File: /Users/lauritsbrok/Documents/Drev/ITU/Bachelor/YogaPosePerfectApp/src/app/layout.tsx
+// File: /Users/tjornelund/Documents/ITU/Bachelor_Project/YogaPosePerfectApp/src/app/layout.tsx
 import * as entry from '../../../src/app/layout.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

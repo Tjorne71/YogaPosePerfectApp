@@ -22,71 +22,32 @@ import * as mpPose from '@mediapipe/pose';
 import * as tfjsWasm from '@tensorflow/tfjs-backend-wasm';
 import * as tf from '@tensorflow/tfjs-core';
 
-tfjsWasm.setWasmPaths(
-    `https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm@${
-        tfjsWasm.version_wasm}/dist/`);
+tfjsWasm.setWasmPaths(`https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm@${tfjsWasm.version_wasm}/dist/`);
 
 import * as posedetection from '@tensorflow-models/pose-detection';
 
-import {Camera} from './camera';
-import {RendererWebGPU} from './renderer_webgpu';
-import {RendererCanvas2d} from './renderer_canvas2d';
-import {setupDatGui} from './option_panel';
-import {STATE} from './params';
-import {setupStats} from './stats_panel';
-import {setBackendAndEnvFlags} from './util';
+import { Camera } from './camera';
+import { RendererCanvas2d } from './renderer_canvas2d';
+import { STATE } from './params';
+import { setupStats } from './stats_panel';
+import { setBackendAndEnvFlags } from './util';
 import * as params from './params';
 
-
 let detector, camera, stats;
-let startInferenceTime, numInferences = 0;
-let inferenceTimeSum = 0, lastPanelUpdate = 0;
+let startInferenceTime,
+  numInferences = 0;
+let inferenceTimeSum = 0,
+  lastPanelUpdate = 0;
 let rafId;
 let renderer = null;
 let useGpuRenderer = false;
 
 async function createDetector() {
-  switch (STATE.model) {
-    case posedetection.SupportedModels.PoseNet:
-      return posedetection.createDetector(STATE.model, {
-        quantBytes: 4,
-        architecture: 'MobileNetV1',
-        outputStride: 16,
-        inputResolution: {width: 500, height: 500},
-        multiplier: 0.75
-      });
-    case posedetection.SupportedModels.BlazePose:
-      const runtime = STATE.backend.split('-')[0];
-      if (runtime === 'mediapipe') {
-        return posedetection.createDetector(STATE.model, {
-          runtime,
-          modelType: STATE.modelConfig.type,
-          solutionPath:
-              `https://cdn.jsdelivr.net/npm/@mediapipe/pose@${mpPose.VERSION}`
-        });
-      } else if (runtime === 'tfjs') {
-        return posedetection.createDetector(
-            STATE.model, {runtime, modelType: STATE.modelConfig.type});
-      }
-    case posedetection.SupportedModels.MoveNet:
-      let modelType;
-      if (STATE.modelConfig.type == 'lightning') {
-        modelType = posedetection.movenet.modelType.SINGLEPOSE_LIGHTNING;
-      } else if (STATE.modelConfig.type == 'thunder') {
-        modelType = posedetection.movenet.modelType.SINGLEPOSE_THUNDER;
-      } else if (STATE.modelConfig.type == 'multipose') {
-        modelType = posedetection.movenet.modelType.MULTIPOSE_LIGHTNING;
-      }
-      const modelConfig = {modelType};
-
-      if (STATE.modelConfig.customModel !== '') {
-        modelConfig.modelUrl = STATE.modelConfig.customModel;
-      }
-      if (STATE.modelConfig.type === 'multipose') {
-        modelConfig.enableTracking = STATE.modelConfig.enableTracking;
-      }
-      return posedetection.createDetector(STATE.model, modelConfig);
-  }
+  return posedetection.createDetector(posedetection.SupportedModels.BlazePose, {
+    runtime: 'mediapipe',
+    modelType: 'heavy',
+    solutionPath: `https://cdn.jsdelivr.net/npm/@mediapipe/pose@${mpPose.VERSION}`,
+  });
 }
 
 async function checkGuiUpdate() {
@@ -136,8 +97,7 @@ function endEstimatePosesStats() {
     const averageInferenceTime = inferenceTimeSum / numInferences;
     inferenceTimeSum = 0;
     numInferences = 0;
-    stats.customFpsPanel.update(
-        1000.0 / averageInferenceTime, 120 /* maxValue */);
+    stats.customFpsPanel.update(1000.0 / averageInferenceTime, 120 /* maxValue */);
     lastPanelUpdate = endInferenceTime;
   }
 }
@@ -168,15 +128,17 @@ async function renderResult() {
     try {
       if (useGpuRenderer) {
         const [posesTemp, canvasInfoTemp] = await detector.estimatePosesGPU(
-            camera.video,
-            {maxPoses: STATE.modelConfig.maxPoses, flipHorizontal: false},
-            true);
+          camera.video,
+          { maxPoses: STATE.modelConfig.maxPoses, flipHorizontal: false },
+          true
+        );
         poses = posesTemp;
         canvasInfo = canvasInfoTemp;
       } else {
-        poses = await detector.estimatePoses(
-            camera.video,
-            {maxPoses: STATE.modelConfig.maxPoses, flipHorizontal: false});
+        poses = await detector.estimatePoses(camera.video, {
+          maxPoses: STATE.modelConfig.maxPoses,
+          flipHorizontal: false,
+        });
       }
     } catch (error) {
       detector.dispose();
@@ -186,33 +148,26 @@ async function renderResult() {
 
     endEstimatePosesStats();
   }
-  const rendererParams = useGpuRenderer ?
-      [camera.video, poses, canvasInfo, STATE.modelConfig.scoreThreshold] :
-      [camera.video, poses, STATE.isModelChanged];
+  const rendererParams = useGpuRenderer
+    ? [camera.video, poses, canvasInfo, STATE.modelConfig.scoreThreshold]
+    : [camera.video, poses, STATE.isModelChanged];
   renderer.draw(rendererParams);
 }
 
 async function renderPrediction() {
   await checkGuiUpdate();
 
-  if (!STATE.isModelChanged) {
-    await renderResult();
-  }
+  await renderResult();
 
   rafId = requestAnimationFrame(renderPrediction);
-};
+}
 
 export async function app() {
-  // Gui content will change depending on which model is in the query string.
-  const urlParams = new URLSearchParams(window.location.search);
-
   params.STATE.model = posedetection.SupportedModels.BlazePose;
   const backends = params.MODEL_BACKEND_MAP[params.STATE.model];
   params.STATE.backend = backends[0];
 
   stats = setupStats();
-  const isWebGPU = STATE.backend === 'tfjs-webgpu';
-  const importVideo = (urlParams.get('importVideo') === 'true') && isWebGPU;
 
   camera = await Camera.setup(STATE.camera);
 
@@ -222,18 +177,9 @@ export async function app() {
   const canvas = document.getElementById('output');
   canvas.width = camera.video.width;
   canvas.height = camera.video.height;
-  useGpuRenderer = (urlParams.get('gpuRenderer') === 'true') && isWebGPU;
-  if (useGpuRenderer) {
-    renderer = new RendererWebGPU(canvas, importVideo);
-  } else {
-    renderer = new RendererCanvas2d(canvas);
-  }
+  renderer = new RendererCanvas2d(canvas);
 
   renderPrediction();
-};
+}
 
 app();
-
-if (useGpuRenderer) {
-  renderer.dispose();
-}
