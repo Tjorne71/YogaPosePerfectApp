@@ -35,6 +35,8 @@ import {setupDatGui} from './option_panel';
 import {STATE} from './params';
 import {setupStats} from './stats_panel';
 import {setBackendAndEnvFlags} from './util';
+import * as params from './params';
+
 
 let detector, camera, stats;
 let startInferenceTime, numInferences = 0;
@@ -203,11 +205,10 @@ async function renderPrediction() {
 export async function app() {
   // Gui content will change depending on which model is in the query string.
   const urlParams = new URLSearchParams(window.location.search);
-  if (!urlParams.has('model')) {
-    alert('Cannot find model in the query string.');
-    return;
-  }
-  await setupDatGui(urlParams);
+
+  params.STATE.model = posedetection.SupportedModels.BlazePose;
+  const backends = params.MODEL_BACKEND_MAP[params.STATE.model];
+  params.STATE.backend = backends[0];
 
   stats = setupStats();
   const isWebGPU = STATE.backend === 'tfjs-webgpu';
