@@ -1,6 +1,6 @@
 import * as tmPose from '@teachablemachine/pose';
 
-const URL = "https://teachablemachine.withgoogle.com/models/Z0BykVMpn/";
+const URL = "https://teachablemachine.withgoogle.com/models/FBlTxM2T3/";
 
 
 export class PosePredictor {
