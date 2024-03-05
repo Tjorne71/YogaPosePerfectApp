@@ -40,7 +40,6 @@ let inferenceTimeSum = 0,
   lastPanelUpdate = 0;
 let rafId;
 let renderer = null;
-let useGpuRenderer = false;
 
 async function createDetector() {
   return posedetection.createDetector(posedetection.SupportedModels.BlazePose, {
@@ -112,34 +111,19 @@ async function renderResult() {
   }
 
   let poses = null;
-  let canvasInfo = null;
 
   // Detector can be null if initialization failed (for example when loading
   // from a URL that does not exist).
   if (detector != null) {
     // FPS only counts the time it takes to finish estimatePoses.
     beginEstimatePosesStats();
-
-    if (useGpuRenderer && STATE.model !== 'PoseNet') {
-      throw new Error('Only PoseNet supports GPU renderer!');
-    }
     // Detectors can throw errors, for example when using custom URLs that
     // contain a model that doesn't provide the expected output.
     try {
-      if (useGpuRenderer) {
-        const [posesTemp, canvasInfoTemp] = await detector.estimatePosesGPU(
-          camera.video,
-          { maxPoses: STATE.modelConfig.maxPoses, flipHorizontal: false },
-          true
-        );
-        poses = posesTemp;
-        canvasInfo = canvasInfoTemp;
-      } else {
-        poses = await detector.estimatePoses(camera.video, {
-          maxPoses: STATE.modelConfig.maxPoses,
-          flipHorizontal: false,
-        });
-      }
+      poses = await detector.estimatePoses(camera.video, {
+        maxPoses: STATE.modelConfig.maxPoses,
+        flipHorizontal: false,
+      });
     } catch (error) {
       detector.dispose();
       detector = null;
@@ -148,9 +132,7 @@ async function renderResult() {
 
     endEstimatePosesStats();
   }
-  const rendererParams = useGpuRenderer
-    ? [camera.video, poses, canvasInfo, STATE.modelConfig.scoreThreshold]
-    : [camera.video, poses, STATE.isModelChanged];
+  const rendererParams = [camera.video, poses, STATE.isModelChanged];
   renderer.draw(rendererParams);
 }
 

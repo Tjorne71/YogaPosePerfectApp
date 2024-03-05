@@ -15,8 +15,8 @@
  * =============================================================================
  */
 import * as tf from '@tensorflow/tfjs-core';
-import {showBackendConfigs} from './option_panel';
-import {STATE, TUNABLE_FLAG_VALUE_RANGE_MAP} from './params';
+import { showBackendConfigs } from './option_panel';
+import { STATE, TUNABLE_FLAG_VALUE_RANGE_MAP } from './params';
 
 export function isiOS() {
   return /iPhone|iPad|iPod/i.test(navigator.userAgent);
@@ -38,8 +38,10 @@ export function isMobile() {
 async function resetBackend(backendName) {
   const ENGINE = tf.engine();
   if (!(backendName in ENGINE.registryFactory)) {
-    if(backendName === 'webgpu') {
-      alert('webgpu backend is not registered. Your browser may not support WebGPU yet. To test this backend, please use a supported browser, e.g. Chrome canary with --enable-unsafe-webgpu flag');
+    if (backendName === 'webgpu') {
+      alert(
+        'webgpu backend is not registered. Your browser may not support WebGPU yet. To test this backend, please use a supported browser, e.g. Chrome canary with --enable-unsafe-webgpu flag'
+      );
       STATE.backend = !!STATE.lastTFJSBackend ? STATE.lastTFJSBackend : 'tfjs-webgl';
       showBackendConfigs();
       return;
@@ -80,8 +82,7 @@ export async function setBackendAndEnvFlags(flagConfig, backend) {
   if (flagConfig == null) {
     return;
   } else if (typeof flagConfig !== 'object') {
-    throw new Error(
-        `An object is expected, while a(n) ${typeof flagConfig} is found.`);
+    throw new Error(`An object is expected, while a(n) ${typeof flagConfig} is found.`);
   }
 
   // Check the validation of flags and values.
@@ -92,9 +93,9 @@ export async function setBackendAndEnvFlags(flagConfig, backend) {
     }
     if (TUNABLE_FLAG_VALUE_RANGE_MAP[flag].indexOf(flagConfig[flag]) === -1) {
       throw new Error(
-          `${flag} value is expected to be in the range [${
-              TUNABLE_FLAG_VALUE_RANGE_MAP[flag]}], while ${flagConfig[flag]}` +
-          ' is found.');
+        `${flag} value is expected to be in the range [${TUNABLE_FLAG_VALUE_RANGE_MAP[flag]}], while ${flagConfig[flag]}` +
+          ' is found.'
+      );
     }
   }
 
