@@ -16,6 +16,8 @@ export default function Home() {
           <div className="canvas-wrapper">
             <canvas id="output"></canvas>
             <video id="video" playsInline className="scale-x-[-1] invisible w-auto h-auto"></video>
+            <span id='predictionText0'></span>
+            <span id='predictionText1'></span>
           </div>
           <div id="scatter-gl-container"></div>
         </div>

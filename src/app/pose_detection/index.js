@@ -31,6 +31,7 @@ import { RendererCanvas2d } from './renderer_canvas2d';
 import { STATE } from './params';
 import { setupStats } from './stats_panel';
 import { setBackendAndEnvFlags } from './util';
+import { PosePredictor } from './predict';
 import * as params from './params';
 
 let detector, camera, stats;
@@ -40,11 +41,13 @@ let inferenceTimeSum = 0,
   lastPanelUpdate = 0;
 let rafId;
 let renderer = null;
+let posePredictor = null;
+let lastPredictionTime = 0;
 
 async function createDetector() {
   return posedetection.createDetector(posedetection.SupportedModels.BlazePose, {
     runtime: 'mediapipe',
-    modelType: 'heavy',
+    modelType: 'light',
     solutionPath: `https://cdn.jsdelivr.net/npm/@mediapipe/pose@${mpPose.VERSION}`,
   });
 }
@@ -129,6 +132,14 @@ async function renderResult() {
       detector = null;
       alert(error);
     }
+    
+    // Check if a second has passed since the last prediction
+    const currentTime = performance.now();
+    if (currentTime - lastPredictionTime >= 1000) {
+      const predictions = await posePredictor.predict(camera.video);
+      console.log(predictions);
+      lastPredictionTime = currentTime; // Update last prediction time
+    }
 
     endEstimatePosesStats();
   }
@@ -160,6 +171,9 @@ export async function app() {
   canvas.width = camera.video.width;
   canvas.height = camera.video.height;
   renderer = new RendererCanvas2d(canvas);
+
+  posePredictor = new PosePredictor();
+  await posePredictor.init();
 
   renderPrediction();
 }
