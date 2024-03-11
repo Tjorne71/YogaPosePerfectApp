@@ -33,6 +33,10 @@ import { setupStats } from './stats_panel';
 import { setBackendAndEnvFlags } from './util';
 import { PosePredictor } from './predict';
 import * as params from './params';
+import warrior2 from '@/app/assets/warrior_2.svg'
+import fourLimbedStaff from '@/app/assets/four_limbed_staff.svg'
+import treePose from '@/app/assets/tree_pose.svg'
+import downwardFacingDog from '@/app/assets/downward_facing_dog.svg'
 
 let detector, camera, stats;
 let startInferenceTime,
@@ -137,7 +141,8 @@ async function renderResult() {
     const currentTime = performance.now();
     if (currentTime - lastPredictionTime >= 1000) {
       const predictions = await posePredictor.predict(camera.video);
-      console.log(predictions);
+      const image = posePredictor.getHighestProbabilityPose(predictions);
+      renderer.setOverlayImage(image.src, 400);
       lastPredictionTime = currentTime; // Update last prediction time
     }
 
@@ -168,8 +173,10 @@ export async function app() {
   await tf.ready();
   detector = await createDetector();
   const canvas = document.getElementById('output');
-  canvas.width = camera.video.width;
-  canvas.height = camera.video.height;
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  //canvas.width = camera.video.width;
+  //canvas.height = camera.video.height;
   renderer = new RendererCanvas2d(canvas);
 
   posePredictor = new PosePredictor();

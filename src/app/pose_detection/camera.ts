@@ -13,9 +13,9 @@ export class Camera {
    * @param cameraParam From app `STATE.camera`.
    */
   static async setup(cameraParam: { targetFPS: number; sizeOption: string }) {
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      throw new Error('Browser API navigator.mediaDevices.getUserMedia not available');
-    }
+    // if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    //   throw new Error('Browser API navigator.mediaDevices.getUserMedia not available');
+    // }
 
     const { targetFPS, sizeOption } = cameraParam;
     const $size = params.VIDEO_SIZE[sizeOption];
@@ -50,10 +50,7 @@ export class Camera {
     const videoHeight = camera.video.videoHeight;
     // Must set below two lines, otherwise video element doesn't show.
     camera.video.width = videoWidth;
-    camera.video.height = videoHeight;
-
-    const canvasContainer = document.querySelector('.canvas-wrapper') as HTMLElement;
-    canvasContainer.style.cssText = `width: ${videoWidth}px; height: ${videoHeight}px`;
+    camera.video.height = videoHeight
 
     return camera;
   }

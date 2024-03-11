@@ -1,7 +1,15 @@
 import * as tmPose from '@teachablemachine/pose';
+import warrior2 from '@/app/assets/warrior_2.svg'
+import fourLimbedStaff from '@/app/assets/four_limbed_staff.svg'
+import treePose from '@/app/assets/tree_pose.svg'
+import downwardFacingDog from '@/app/assets/downward_facing_dog.svg'
 
 const URL = "https://teachablemachine.withgoogle.com/models/FBlTxM2T3/";
 
+interface PosePrediction {
+  className: string;
+  probability: number;
+}
 
 export class PosePredictor {
   model?: tmPose.CustomPoseNet;
@@ -20,19 +28,31 @@ export class PosePredictor {
   }
   
   async predict(canvas : HTMLVideoElement) {
-    let predictions = [];
+    let predictions : PosePrediction[] = [];
     if(this.model != null){
       const { posenetOutput } = await this.model.estimatePose(canvas);
-  
-      const prediction = await this.model.predict(posenetOutput);
-      for (let i = 0; i < this.maxPredictions; i++) {
-          const classPrediction =
-              prediction[i].className + ": " + prediction[i].probability.toFixed(2);
-              predictions.push(classPrediction);
-              let element = document.getElementById("predictionText" + i);
-              if(element != null) element.innerText = classPrediction;
-      }
+      predictions = await this.model.predict(posenetOutput);
     }
     return predictions;
+  }
+
+  getHighestProbabilityPose(predictions : PosePrediction[]){
+    let highestPrediction = predictions[0];
+    for (const prediction of predictions) {
+      if (prediction.probability > highestPrediction.probability) {
+        highestPrediction = prediction;
+      }
+    }
+    console.log(highestPrediction);
+    switch (highestPrediction.className) {
+      case 'Downward-Facing Dog':
+        return downwardFacingDog;
+      case 'Four-Limbed Staff':
+        return fourLimbedStaff;
+      case 'Tree Pose':
+        return treePose;
+      case 'Warrior 2':
+        return warrior2;
+    }
   }
 }

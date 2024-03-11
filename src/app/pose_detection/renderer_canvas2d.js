@@ -61,6 +61,15 @@ export class RendererCanvas2d {
     this.videoWidth = canvas.width;
     this.videoHeight = canvas.height;
     this.flip(this.videoWidth, this.videoHeight);
+    this.overlayImage = null; // This will store the Image object
+    this.overlayImageX = 0; // X position of the overlay image
+    this.overlayImageY = 0; // Y position of the overlay image
+    this.overlayImageWidth = 0; // Width of the overlay image
+    this.overlayImageHeight = 0; // Height of the overlay image
+    this.scaleX = 1;
+    this.scaleY = 1;
+    this.offsetX = 0;
+    this.offsetY = 0;
   }
 
   flip(videoWidth, videoHeight) {
@@ -86,10 +95,43 @@ export class RendererCanvas2d {
     if (poses && poses.length > 0 && !isModelChanged) {
       this.drawResults(poses);
     }
+
+    this.drawOverlayImage();
   }
 
   drawCtx(video) {
-    this.ctx.drawImage(video, 0, 0, this.videoWidth, this.videoHeight);
+    // Calculate aspect ratios
+    const canvasAspectRatio = this.videoWidth / this.videoHeight;
+    const videoAspectRatio = video.videoWidth / video.videoHeight;
+  
+    let drawWidth, drawHeight, drawX, drawY;
+  
+    // Compare aspect ratios to determine scaling
+    if (videoAspectRatio > canvasAspectRatio) {
+      // Video is wider than canvas, scale by height
+      drawHeight = this.videoHeight;
+      drawWidth = video.videoWidth * (drawHeight / video.videoHeight);
+      drawX = (this.videoWidth - drawWidth) / 2;
+      drawY = 0;
+    } else {
+      // Video is taller than canvas, scale by width
+      drawWidth = this.videoWidth;
+      drawHeight = video.videoHeight * (drawWidth / video.videoWidth);
+      drawX = 0;
+      drawY = (this.videoHeight - drawHeight) / 2;
+    }
+  
+    // Clear the canvas before redrawing
+    this.clearCtx();
+
+    // Store scale factors and offsets for use in drawing keypoints and skeletons
+    this.scaleX = drawWidth / video.videoWidth;
+    this.scaleY = drawHeight / video.videoHeight;
+    this.offsetX = drawX;
+    this.offsetY = drawY;
+  
+    // Draw the video with new dimensions to fit within the canvas without distortion
+    this.ctx.drawImage(video, drawX, drawY, drawWidth, drawHeight);
   }
 
   clearCtx() {
@@ -147,16 +189,15 @@ export class RendererCanvas2d {
   }
 
   drawKeypoint(keypoint) {
-    // If score is null, just show the keypoint.
-    const score = keypoint.score != null ? keypoint.score : 1;
-    const scoreThreshold = params.STATE.modelConfig.scoreThreshold || 0;
-
-    if (score >= scoreThreshold) {
-      const circle = new Path2D();
-      circle.arc(keypoint.x, keypoint.y, params.DEFAULT_RADIUS, 0, 2 * Math.PI);
-      this.ctx.fill(circle);
-      this.ctx.stroke(circle);
-    }
+    // Apply scaling and offset to keypoint coordinates
+    const x = keypoint.x * this.scaleX + this.offsetX;
+    const y = keypoint.y * this.scaleY + this.offsetY;
+  
+    // Existing code to draw the keypoint using the transformed coordinates
+    const circle = new Path2D();
+    circle.arc(x, y, params.DEFAULT_RADIUS, 0, 2 * Math.PI);
+    this.ctx.fill(circle);
+    this.ctx.stroke(circle);
   }
 
   /**
@@ -172,21 +213,24 @@ export class RendererCanvas2d {
     this.ctx.strokeStyle = color;
     this.ctx.lineWidth = params.DEFAULT_LINE_WIDTH;
 
-    posedetection.util.getAdjacentPairs(params.STATE.model).forEach(([
-                                                                      i, j
-                                                                    ]) => {
+    posedetection.util.getAdjacentPairs(params.STATE.model).forEach(([i, j]) => {
       const kp1 = keypoints[i];
       const kp2 = keypoints[j];
-
-      // If score is null, just show the keypoint.
+  
+      // Apply scaling and offset to keypoint coordinates
+      const x1 = kp1.x * this.scaleX + this.offsetX;
+      const y1 = kp1.y * this.scaleY + this.offsetY;
+      const x2 = kp2.x * this.scaleX + this.offsetX;
+      const y2 = kp2.y * this.scaleY + this.offsetY;
+  
+      // Existing code to draw the line if keypoints are above the threshold
       const score1 = kp1.score != null ? kp1.score : 1;
       const score2 = kp2.score != null ? kp2.score : 1;
       const scoreThreshold = params.STATE.modelConfig.scoreThreshold || 0;
-
       if (score1 >= scoreThreshold && score2 >= scoreThreshold) {
         this.ctx.beginPath();
-        this.ctx.moveTo(kp1.x, kp1.y);
-        this.ctx.lineTo(kp2.x, kp2.y);
+        this.ctx.moveTo(x1, y1);
+        this.ctx.lineTo(x2, y2);
         this.ctx.stroke();
       }
     });
@@ -228,4 +272,34 @@ export class RendererCanvas2d {
     this.scatterGL.setSequences(sequences);
     this.scatterGLHasInitialized = true;
   }
+
+  setOverlayImage(imageSrc, newWidth = null) {
+    const img = new Image();
+    img.src = imageSrc;
+    img.onload = () => {
+      this.overlayImage = img;
+  
+      // Calculate the new height to maintain the aspect ratio
+      const aspectRatio = img.naturalHeight / img.naturalWidth;
+      const scaledHeight = newWidth ? newWidth * aspectRatio : img.naturalHeight;
+      const scaledWidth = newWidth ?? img.naturalWidth;
+  
+      // Center the image
+      this.overlayImageX = (this.videoWidth - scaledWidth) / 2; // Center horizontally
+      this.overlayImageY = (this.videoHeight - scaledHeight) / 2; // Center vertically
+  
+      this.overlayImageWidth = scaledWidth;
+      this.overlayImageHeight = scaledHeight;
+  
+      // Optionally, redraw the overlay image immediately
+      // this.drawOverlayImage();
+    };
+  }
+
+  drawOverlayImage() {
+    if (this.overlayImage) {
+      this.ctx.drawImage(this.overlayImage, this.overlayImageX, this.overlayImageY, this.overlayImageWidth, this.overlayImageHeight);
+    }
+  }
+
 }
