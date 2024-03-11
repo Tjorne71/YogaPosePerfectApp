@@ -15,7 +15,6 @@
  * =============================================================================
  */
 import * as tf from '@tensorflow/tfjs-core';
-import { showBackendConfigs } from './option_panel';
 import { STATE, TUNABLE_FLAG_VALUE_RANGE_MAP } from './params';
 
 export function isiOS() {
@@ -43,7 +42,6 @@ async function resetBackend(backendName) {
         'webgpu backend is not registered. Your browser may not support WebGPU yet. To test this backend, please use a supported browser, e.g. Chrome canary with --enable-unsafe-webgpu flag'
       );
       STATE.backend = !!STATE.lastTFJSBackend ? STATE.lastTFJSBackend : 'tfjs-webgl';
-      showBackendConfigs();
       return;
     } else {
       throw new Error(`${backendName} backend is not registered.`);
