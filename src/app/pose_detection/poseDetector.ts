@@ -28,6 +28,7 @@ import * as posedetection from '@tensorflow-models/pose-detection';
 
 import { Camera } from './camera';
 import * as params from './params';
+import { Pose } from '@tensorflow-models/pose-detection';
 
 export class PoseDetector {
   _detector: posedetection.PoseDetector | undefined;
@@ -60,7 +61,7 @@ export class PoseDetector {
       });
     }
 
-    let poses = null;
+    let poses: Pose[] = [];
 
     // Detector can be null if initialization failed (for example when loading
     // from a URL that does not exist).

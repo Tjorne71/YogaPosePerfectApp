@@ -1,7 +1,6 @@
 'use client';
 import React, { useEffect, useRef } from 'react';
 import { Pose } from '@tensorflow-models/pose-detection';
-import Landmark from '../Landmark/Landmark';
 import { RendererCanvas2d } from '@/app/util/RendererCanvas2d';
 
 interface PoseCanvasProps {
@@ -23,5 +22,5 @@ export default function PoseCanvas({ poses, video, mirrored, canvasWidth, canvas
     rendererCanvas2d.draw(video, poses);
   }, [poses, mirrored, video]);
 
-  return <canvas className={className} width={canvasWidth} height={canvasHeight} ref={canvasRef}></canvas>;
+  return <canvas className={className} width={canvasWidth} height={canvasHeight} ref={canvasRef} />;
 }

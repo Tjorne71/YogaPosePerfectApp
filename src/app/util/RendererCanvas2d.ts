@@ -2,7 +2,7 @@ import { Pose, Keypoint } from '@tensorflow-models/pose-detection';
 import * as posedetection from '@tensorflow-models/pose-detection';
 
 export class RendererCanvas2d {
-  _DEFAULT_LINE_WIDTH = 3;
+  _DEFAULT_LINE_WIDTH = 1;
   _model = posedetection.SupportedModels.BlazePose;
 
   _canvasContext: CanvasRenderingContext2D;
@@ -26,7 +26,6 @@ export class RendererCanvas2d {
     this._canvasContext = ctx;
     this._videoWidth = canvas.width;
     this._videoHeight = canvas.height;
-    this.flip(canvas.width);
     this._overlayImage = null; // This will store the Image object
     this._overlayImageX = 0; // X position of the overlay image
     this._overlayImageY = 0; // Y position of the overlay image
@@ -36,15 +35,13 @@ export class RendererCanvas2d {
     this._scaleY = 1;
     this._offsetX = 0;
     this._offsetY = 0;
+    // this.flip(canvas.width);
   }
 
   flip(videoWidth: number) {
-    // Check if canvas context exists and if the video is flipped
-    if (this._canvasContext && this._canvasContext.getTransform().a !== -1) {
-      // Because the image from the camera is mirrored, need to flip horizontally.
-      this._canvasContext.translate(videoWidth, 0);
-      this._canvasContext.scale(-1, 1);
-    }
+    this._canvasContext.setTransform(1, 0, 0, 1, 0, 0);
+    this._canvasContext.translate(videoWidth, 0);
+    this._canvasContext.scale(-1, 1);
   }
 
   draw(video: HTMLVideoElement, poses: Pose[]) {
@@ -115,9 +112,7 @@ export class RendererCanvas2d {
   drawResult(pose: Pose) {
     if (pose.keypoints != null) {
       this.drawKeypoints(pose.keypoints);
-      if (pose.id != undefined) {
-        this.drawSkeleton(pose.keypoints, pose.id);
-      }
+      this.drawSkeleton(pose.keypoints);
     }
   }
 
@@ -129,7 +124,7 @@ export class RendererCanvas2d {
     const keypointInd = posedetection.util.getKeypointIndexBySide(this._model);
     this._canvasContext.fillStyle = 'Red';
     this._canvasContext.strokeStyle = 'White';
-    this._canvasContext.lineWidth = 1;
+    this._canvasContext.lineWidth = this._DEFAULT_LINE_WIDTH;
 
     for (const i of keypointInd.middle) {
       this.drawKeypoint(keypoints[i]);
@@ -169,7 +164,7 @@ export class RendererCanvas2d {
    * Draw the skeleton of a body on the video.
    * @param keypoints A list of keypoints.
    */
-  drawSkeleton(keypoints: Keypoint[], poseId: number) {
+  drawSkeleton(keypoints: Keypoint[]) {
     // Each poseId is mapped to a color in the color palette.
     const color = 'White';
     this._canvasContext.fillStyle = color;
