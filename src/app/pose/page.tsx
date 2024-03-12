@@ -3,8 +3,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import Webcam from 'react-webcam';
 import { PoseDetector } from '@/app/pose_detection/poseDetector';
 import { Pose } from '@tensorflow-models/pose-detection';
-import PoseCanvas from '@/app/shared/components/PoseCanvas/PoseCanvas';
-import { PosePrediction, PosePredictor } from '@/app/pose_detection/posePredictor';
+import PoseCanvas from '../shared/components/PoseCanvas/PoseCanvas';
+import { PosePrediction, PosePredictor } from '../pose_detection/posePredictor';
 
 export default function Pose() {
   const webcamRef = useRef<Webcam>(null);

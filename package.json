@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "tsc:build": "tsc -p tsconfig.json"
   },
   "dependencies": {
     "@mediapipe/pose": "^0.5.1675469404",
@@ -17,7 +18,7 @@
     "next": "14.1.1",
     "react": "^18",
     "react-dom": "^18",
-    "react-full-screen": "^1.1.1",
+    "react-webcam": "^7.2.0",
     "scatter-gl": "^0.0.13",
     "stats-js": "^1.0.1"
   },
