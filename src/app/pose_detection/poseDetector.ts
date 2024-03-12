@@ -50,8 +50,8 @@ export class PoseDetector {
     });
   }
 
-  async renderResult() {
-    if (this._camera == undefined || this._detector == undefined) return;
+  async renderResult(): Promise<posedetection.Pose[]> {
+    if (this._camera == undefined || this._detector == undefined) return [];
     if (this._camera.video.readyState < 2) {
       await new Promise((resolve) => {
         this._camera!.video.onloadeddata = (video) => {
@@ -78,7 +78,7 @@ export class PoseDetector {
         alert(error);
       }
     }
-    console.log(poses);
+    return poses || [];
   }
 
   async renderPrediction() {
