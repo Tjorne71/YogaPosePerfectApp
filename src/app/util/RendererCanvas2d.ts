@@ -236,6 +236,7 @@ export class RendererCanvas2d {
         this._overlayImageWidth,
         this._overlayImageHeight
       );
+      this.clear_canvasContext();
     }
   }
 }

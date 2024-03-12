@@ -78,7 +78,7 @@ export default function Pose() {
           canvasWidth={webcamRef.current.video.offsetWidth}
         />
       )}
-      {/* {webcamRef.current?.video && (
+      {webcamRef.current?.video && (
         <PredictionCanvas
           className="absolute -scale-x-100"
           posePrediction={posePrediction}
@@ -86,7 +86,7 @@ export default function Pose() {
           canvasHeight={webcamRef.current.video.offsetHeight}
           canvasWidth={webcamRef.current.video.offsetWidth}
         />
-      )} */}
+      )}
     </main>
   );
 }
