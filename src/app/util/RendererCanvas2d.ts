@@ -40,13 +40,6 @@ export class RendererCanvas2d {
     this._scaleY = 1;
     this._offsetX = 0;
     this._offsetY = 0;
-    // this.flip(canvas.width);
-  }
-
-  flip(videoWidth: number) {
-    this._canvasContext.setTransform(1, 0, 0, 1, 0, 0);
-    this._canvasContext.translate(videoWidth, 0);
-    this._canvasContext.scale(-1, 1);
   }
 
   draw(video: HTMLVideoElement, poses: Pose[]) {
@@ -58,8 +51,6 @@ export class RendererCanvas2d {
     if (poses && poses.length > 0) {
       this.drawResults(poses);
     }
-
-    this.drawOverlayImage();
   }
 
   draw_canvasContext(video: HTMLVideoElement) {
