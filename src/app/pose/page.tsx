@@ -4,7 +4,7 @@ import Webcam from 'react-webcam';
 import { PoseDetector } from '@/app/pose_detection/poseDetector';
 import { Pose } from '@tensorflow-models/pose-detection';
 import PoseCanvas from '../shared/components/PoseCanvas/PoseCanvas';
-import { PosePredictor } from '../pose_detection/posePredictor';
+import { PosePrediction, PosePredictor } from '../pose_detection/posePredictor';
 
 export default function Pose() {
   const webcamRef = useRef<Webcam>(null);
@@ -12,6 +12,7 @@ export default function Pose() {
   const [poseDetector, setPoseDetector] = useState<PoseDetector | undefined>(undefined);
   const [posePredictor, setPosePredictor] = useState<PosePredictor | undefined>(undefined);
   const [poses, setPoses] = useState<Pose[]>([]);
+  const [posePrediction, setPosePrediction] = useState<PosePrediction | undefined>(undefined);
 
   useEffect(() => {
     async function fetchCamera() {
@@ -29,19 +30,35 @@ export default function Pose() {
 
   useEffect(() => {
     function handlePoseStream() {
-      if (poseDetector && posePredictor) {
+      if (poseDetector) {
         const loop = async () => {
           poseDetector.renderResult().then((poses) => {
             setPoses(poses);
           });
-          console.log(await posePredictor.predict());
           requestAnimationFrame(loop);
         };
         loop();
       }
     }
     handlePoseStream();
-  }, [poseDetector, posePredictor]);
+  }, [poseDetector]);
+
+  useEffect(() => {
+    function handlePoseStream() {
+      if (posePredictor) {
+        const loop = async () => {
+          posePredictor.predict().then((newPosePrediction) => {
+            if (newPosePrediction) {
+              setPosePrediction(newPosePrediction);
+            }
+          });
+          requestAnimationFrame(loop);
+        };
+        loop();
+      }
+    }
+    handlePoseStream();
+  }, [posePredictor]);
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <Webcam
@@ -58,6 +75,7 @@ export default function Pose() {
           video={webcamRef.current.video}
           canvasHeight={webcamRef.current.video.offsetHeight}
           canvasWidth={webcamRef.current.video.offsetWidth}
+          posePrediction={posePrediction}
         />
       )}
     </main>

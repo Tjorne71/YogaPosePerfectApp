@@ -1,5 +1,10 @@
 import { Pose, Keypoint } from '@tensorflow-models/pose-detection';
 import * as posedetection from '@tensorflow-models/pose-detection';
+import warrior2 from '@/app/assets/warrior_2.svg';
+import fourLimbedStaff from '@/app/assets/four_limbed_staff.svg';
+import treePose from '@/app/assets/tree_pose.svg';
+import downwardFacingDog from '@/app/assets/downward_facing_dog.svg';
+import { PosePrediction } from '../pose_detection/posePredictor';
 
 export class RendererCanvas2d {
   _DEFAULT_LINE_WIDTH = 1;
@@ -194,9 +199,23 @@ export class RendererCanvas2d {
     });
   }
 
-  setOverlayImage(imageSrc: string, newWidth = null) {
+  setOverlayImage(posePrediction: PosePrediction, newWidth = null) {
     const img = new Image();
-    img.src = imageSrc;
+    switch (posePrediction.className) {
+      case 'Downward-Facing Dog':
+        img.src = downwardFacingDog.src;
+        break;
+      case 'Four-Limbed Staff':
+        img.src = fourLimbedStaff.src;
+        break;
+      case 'Tree Pose':
+        img.src = treePose.src;
+        break;
+      default:
+        img.src = warrior2.src;
+        break;
+    }
+
     img.onload = () => {
       this._overlayImage = img;
 

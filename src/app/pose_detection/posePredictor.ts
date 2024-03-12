@@ -1,13 +1,9 @@
 import * as tmPose from '@teachablemachine/pose';
-import warrior2 from '@/app/assets/warrior_2.svg';
-import fourLimbedStaff from '@/app/assets/four_limbed_staff.svg';
-import treePose from '@/app/assets/tree_pose.svg';
-import downwardFacingDog from '@/app/assets/downward_facing_dog.svg';
 import { Camera } from './camera';
 
 const URL = 'https://teachablemachine.withgoogle.com/models/FBlTxM2T3/';
 
-interface PosePrediction {
+export interface PosePrediction {
   className: string;
   probability: number;
 }
