@@ -1,20 +1,83 @@
 'use client';
+import React, { useEffect, useRef, useState } from 'react';
+import Webcam from 'react-webcam';
+import { PoseDetector } from '@/app/pose_detection/poseDetector';
+import { Pose } from '@tensorflow-models/pose-detection';
+import PoseCanvas from '@/app/shared/components/PoseCanvas/PoseCanvas';
+import { PosePrediction, PosePredictor } from '@/app/pose_detection/posePredictor';
 
-import { useEffect } from 'react';
+export default function Pose() {
+  const webcamRef = useRef<Webcam>(null);
+  const [userMedia, setUserMedia] = useState<MediaStream | undefined>(undefined);
+  const [poseDetector, setPoseDetector] = useState<PoseDetector | undefined>(undefined);
+  const [posePredictor, setPosePredictor] = useState<PosePredictor | undefined>(undefined);
+  const [poses, setPoses] = useState<Pose[]>([]);
+  const [posePrediction, setPosePrediction] = useState<PosePrediction | undefined>(undefined);
 
-export default function Home() {
+  useEffect(() => {
+    async function fetchCamera() {
+      if (userMedia && document && poseDetector === undefined) {
+        const poseDetector = new PoseDetector();
+        const posePredictor = new PosePredictor();
+        await poseDetector.init(userMedia);
+        await posePredictor.init(userMedia);
+        setPoseDetector(poseDetector);
+        setPosePredictor(posePredictor);
+      }
+    }
+    fetchCamera();
+  }, [userMedia, poseDetector]);
+
+  useEffect(() => {
+    function handlePoseStream() {
+      if (poseDetector) {
+        const loop = async () => {
+          poseDetector.renderResult().then((poses) => {
+            setPoses(poses);
+          });
+          requestAnimationFrame(loop);
+        };
+        loop();
+      }
+    }
+    handlePoseStream();
+  }, [poseDetector]);
+
+  useEffect(() => {
+    function handlePoseStream() {
+      if (posePredictor) {
+        const loop = async () => {
+          posePredictor.predict().then((newPosePrediction) => {
+            if (newPosePrediction) {
+              setPosePrediction(newPosePrediction);
+            }
+          });
+          requestAnimationFrame(loop);
+        };
+        loop();
+      }
+    }
+    handlePoseStream();
+  }, [posePredictor]);
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div id="stats"></div>
-      <div id="main">
-        <div className="container">
-          <div className="canvas-wrapper">
-            <canvas id="output"></canvas>
-            <video id="video" playsInline className="scale-x-[-1] w-auto h-auto"></video>
-          </div>
-          <div id="scatter-gl-container"></div>
-        </div>
-      </div>
+      <Webcam
+        id="video"
+        className="relative"
+        ref={webcamRef}
+        onUserMedia={(userMedia) => setUserMedia(userMedia)}
+        mirrored
+      />
+      {webcamRef.current?.video && (
+        <PoseCanvas
+          className="absolute -scale-x-100"
+          poses={poses}
+          video={webcamRef.current.video}
+          canvasHeight={webcamRef.current.video.offsetHeight}
+          canvasWidth={webcamRef.current.video.offsetWidth}
+          posePrediction={posePrediction}
+        />
+      )}
     </main>
   );
 }

@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "tsc:build": "tsc -p tsconfig.json"
   },
   "dependencies": {
     "@mediapipe/pose": "^0.5.1675469404",
@@ -22,7 +23,6 @@
     "stats-js": "^1.0.1"
   },
   "devDependencies": {
-    "@types/dat.gui": "^0.7.12",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
