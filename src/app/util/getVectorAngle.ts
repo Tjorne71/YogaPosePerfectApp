@@ -20,7 +20,7 @@ export function calculate_angle(point1: Coordinate3D, targetPoint: Coordinate3D,
 
   const cos_angle: number = dot_prod / (len_v1 * len_v2);
   const angle_radians: number = Math.acos(cos_angle);
-  const angle_degrees: number = Math.acos(angle_radians);
+  const angle_degrees: number = angle_radians * (180 / Math.PI);
 
   return angle_degrees;
 }
