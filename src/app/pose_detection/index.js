@@ -174,7 +174,7 @@ export async function app() {
   detector = await createDetector();
   const canvas = document.getElementById('output');
   canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
+  canvas.height = window.innerHeight*0.7;
   //canvas.width = camera.video.width;
   //canvas.height = camera.video.height;
   renderer = new RendererCanvas2d(canvas);
