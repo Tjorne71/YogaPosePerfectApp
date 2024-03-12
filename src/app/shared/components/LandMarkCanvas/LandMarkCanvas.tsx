@@ -6,13 +6,21 @@ import { PosePrediction } from '@/app/pose_detection/posePredictor';
 
 interface LandMarkCanvasProps {
   poses: Pose[];
+  posePrediction?: PosePrediction;
   video: HTMLVideoElement;
   canvasWidth: number;
   canvasHeight: number;
   className?: string;
 }
 
-export default function LandMarkCanvas({ poses, video, canvasWidth, canvasHeight, className }: LandMarkCanvasProps) {
+export default function LandMarkCanvas({
+  poses,
+  posePrediction,
+  video,
+  canvasWidth,
+  canvasHeight,
+  className,
+}: LandMarkCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [rendererCanvas2d, setRendererCanvas2d] = useState<RendererCanvas2d | undefined>(undefined);
 
@@ -22,9 +30,12 @@ export default function LandMarkCanvas({ poses, video, canvasWidth, canvasHeight
     if (rendererCanvas2d === undefined) {
       setRendererCanvas2d(new RendererCanvas2d(canvas));
     } else {
+      if (posePrediction) {
+        rendererCanvas2d.setOverlayImage(posePrediction);
+      }
       rendererCanvas2d.draw(video, poses);
     }
-  }, [poses, video, rendererCanvas2d]);
+  }, [poses, video, rendererCanvas2d, posePrediction]);
 
   return <canvas className={className} width={canvasWidth} height={canvasHeight} ref={canvasRef} />;
 }

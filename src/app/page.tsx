@@ -5,7 +5,6 @@ import { PoseDetector } from '@/app/pose_detection/poseDetector';
 import { Pose } from '@tensorflow-models/pose-detection';
 import LandMarkCanvas from '@/app/shared/components/LandMarkCanvas/LandMarkCanvas';
 import { PosePrediction, PosePredictor } from '@/app/pose_detection/posePredictor';
-import PredictionCanvas from '@/app/shared/components/PredictionCanvas/PredictionCanvas';
 
 export default function Pose() {
   const webcamRef = useRef<Webcam>(null);
@@ -73,20 +72,12 @@ export default function Pose() {
         <LandMarkCanvas
           className="absolute -scale-x-100"
           poses={poses}
-          video={webcamRef.current.video}
-          canvasHeight={webcamRef.current.video.offsetHeight}
-          canvasWidth={webcamRef.current.video.offsetWidth}
-        />
-      )}
-      {/* {webcamRef.current?.video && (
-        <PredictionCanvas
-          className="absolute -scale-x-100"
           posePrediction={posePrediction}
           video={webcamRef.current.video}
           canvasHeight={webcamRef.current.video.offsetHeight}
           canvasWidth={webcamRef.current.video.offsetWidth}
         />
-      )} */}
+      )}
     </main>
   );
 }

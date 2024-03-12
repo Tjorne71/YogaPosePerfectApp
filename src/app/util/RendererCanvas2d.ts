@@ -51,6 +51,7 @@ export class RendererCanvas2d {
     if (poses && poses.length > 0) {
       this.drawResults(poses);
     }
+    this.drawOverlayImage();
   }
 
   draw_canvasContext(video: HTMLVideoElement) {
@@ -221,9 +222,6 @@ export class RendererCanvas2d {
 
       this._overlayImageWidth = scaledWidth;
       this._overlayImageHeight = scaledHeight;
-
-      // Optionally, redraw the overlay image immediately
-      // this.drawOverlayImage();
     };
   }
 
