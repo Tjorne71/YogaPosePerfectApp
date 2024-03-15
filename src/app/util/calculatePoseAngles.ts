@@ -3,58 +3,85 @@ import { PoseAngles } from '@/app/model/PoseAngles';
 import { calculateAngle } from './calculateAngle';
 import landmarkIndexes from '@/app/assets/mediapipeIndexes/mediapipeIndexes.json';
 
+type LandmarkRelations = {
+  landmark1: keyof typeof landmarkIndexes;
+  target: keyof typeof landmarkIndexes;
+  landmark2: keyof typeof landmarkIndexes;
+};
+
+function flipLandmark(landmarkKey: keyof typeof landmarkIndexes): keyof typeof landmarkIndexes {
+  if (landmarkKey.includes('right')) {
+    return landmarkKey.replace('right', 'left') as keyof typeof landmarkIndexes;
+  } else if (landmarkKey.includes('left')) {
+    return landmarkKey.replace('left', 'right') as keyof typeof landmarkIndexes;
+  }
+  return landmarkKey;
+}
+
+function getRelatedLandmarks(landmarkKey: keyof typeof landmarkIndexes): LandmarkRelations | undefined {
+  switch (landmarkKey) {
+    case 'left elbow':
+      return { landmark1: 'left wrist', target: landmarkKey, landmark2: 'left shoulder' };
+    case 'right elbow':
+      return { landmark1: 'right wrist', target: landmarkKey, landmark2: 'right shoulder' };
+    case 'left hip':
+      return { landmark1: 'left knee', target: landmarkKey, landmark2: 'left shoulder' };
+    case 'right hip':
+      return { landmark1: 'right knee', target: landmarkKey, landmark2: 'right shoulder' };
+    case 'left knee':
+      return { landmark1: 'left hip', target: landmarkKey, landmark2: 'left ankle' };
+    case 'right knee':
+      return { landmark1: 'right hip', target: landmarkKey, landmark2: 'right ankle' };
+    case 'left shoulder':
+      return { landmark1: 'left hip', target: landmarkKey, landmark2: 'left elbow' };
+    case 'right shoulder':
+      return { landmark1: 'right hip', target: landmarkKey, landmark2: 'right elbow' };
+    case 'left ankle':
+      return { landmark1: 'left knee', target: landmarkKey, landmark2: 'left foot index' };
+    case 'right ankle':
+      return { landmark1: 'right knee', target: landmarkKey, landmark2: 'right foot index' };
+    default:
+      return undefined;
+  }
+}
+
 export function calculatePoseAngles(pose: Pose): PoseAngles {
-  const keypoints = pose.keypoints3D || pose.keypoints;
-  return {
-    leftElbowAngle: calculateAngle(
-      keypoints[landmarkIndexes['left wrist']],
-      keypoints[landmarkIndexes['left elbow']],
-      keypoints[landmarkIndexes['left shoulder']]
-    ),
-    rightElbowAngle: calculateAngle(
-      keypoints[landmarkIndexes['right wrist']],
-      keypoints[landmarkIndexes['right elbow']],
-      keypoints[landmarkIndexes['right shoulder']]
-    ),
-    leftHipAngle: calculateAngle(
-      keypoints[landmarkIndexes['left knee']],
-      keypoints[landmarkIndexes['left hip']],
-      keypoints[landmarkIndexes['left shoulder']]
-    ),
-    rightHipAngle: calculateAngle(
-      keypoints[landmarkIndexes['right knee']],
-      keypoints[landmarkIndexes['right hip']],
-      keypoints[landmarkIndexes['right shoulder']]
-    ),
-    leftKneeAngle: calculateAngle(
-      keypoints[landmarkIndexes['left hip']],
-      keypoints[landmarkIndexes['left knee']],
-      keypoints[landmarkIndexes['left ankle']]
-    ),
-    rightKneeAngle: calculateAngle(
-      keypoints[landmarkIndexes['right hip']],
-      keypoints[landmarkIndexes['right knee']],
-      keypoints[landmarkIndexes['right ankle']]
-    ),
-    leftShoulderAngle: calculateAngle(
-      keypoints[landmarkIndexes['left hip']],
-      keypoints[landmarkIndexes['left shoulder']],
-      keypoints[landmarkIndexes['left elbow']]
-    ),
-    rightShoulderAngle: calculateAngle(
-      keypoints[landmarkIndexes['right hip']],
-      keypoints[landmarkIndexes['right shoulder']],
-      keypoints[landmarkIndexes['right elbow']]
-    ),
-    leftAnkle: calculateAngle(
-      keypoints[landmarkIndexes['left knee']],
-      keypoints[landmarkIndexes['left ankle']],
-      keypoints[landmarkIndexes['left foot index']]
-    ),
-    rightAnkle: calculateAngle(
-      keypoints[landmarkIndexes['right knee']],
-      keypoints[landmarkIndexes['right ankle']],
-      keypoints[landmarkIndexes['right foot index']]
-    ),
+  const poseAngles: PoseAngles = {
+    angles: [],
+    flippedAngles: [],
   };
+  const keypoints = pose.keypoints3D || pose.keypoints;
+  Object.keys(landmarkIndexes).map((landmarkKeyRaw) => {
+    const landmarkKey = landmarkKeyRaw as keyof typeof landmarkIndexes;
+    const landmarkRelation = getRelatedLandmarks(landmarkKey);
+    if (landmarkRelation) {
+      const angle = calculateAngle(
+        keypoints[landmarkIndexes[landmarkRelation.landmark1]],
+        keypoints[landmarkIndexes[landmarkRelation.target]],
+        keypoints[landmarkIndexes[landmarkRelation.landmark2]]
+      );
+      keypoints[landmarkIndexes[landmarkRelation.target]];
+      poseAngles.angles.push({
+        landmarkKey: landmarkRelation.target,
+        angle: angle,
+        visibilityScore: keypoints[landmarkIndexes[landmarkRelation.target]].score,
+      });
+    }
+    const flippedLandmarkRelation = getRelatedLandmarks(flipLandmark(landmarkKey));
+    if (flippedLandmarkRelation) {
+      const flippedAngle = calculateAngle(
+        keypoints[landmarkIndexes[flippedLandmarkRelation.landmark1]],
+        keypoints[landmarkIndexes[flippedLandmarkRelation.target]],
+        keypoints[landmarkIndexes[flippedLandmarkRelation.landmark2]]
+      );
+      if (poseAngles.flippedAngles) {
+        poseAngles.flippedAngles.push({
+          landmarkKey: flippedLandmarkRelation.target,
+          angle: flippedAngle,
+          visibilityScore: keypoints[landmarkIndexes[flippedLandmarkRelation.target]].score,
+        });
+      }
+    }
+  });
+  return poseAngles;
 }

@@ -7,6 +7,6 @@ function calculatePercentageError(actualAngle: number, perfectAngle: number, thr
   }
 }
 
-export function angleScore(angle: number, perfectAngle: number): number {
-  return calculatePercentageError(angle, perfectAngle, 10);
+export function calculateAngleScore(angle: number, perfectAngle: number, threshold: number): number {
+  return calculatePercentageError(angle, perfectAngle, threshold);
 }

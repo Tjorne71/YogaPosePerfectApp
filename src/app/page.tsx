@@ -6,11 +6,9 @@ import { Pose } from '@tensorflow-models/pose-detection';
 import LandMarkCanvas from '@/app/shared/components/LandMarkCanvas/LandMarkCanvas';
 import { PosePrediction, PosePredictor } from '@/app/pose_detection/posePredictor';
 import { calculatePoseAngles } from './util/calculatePoseAngles';
-import { PoseAngles } from './model/PoseAngles';
-import AngleDiagram from './shared/components/AngleDiagram/AngleDiagram';
 import { getPerfectPoseAngles } from './util/getPerfectPoseAngles';
-import { flipPoseAngles } from './util/flipPoseAngles';
 import { calculatePoseScore } from './util/calculatePoseAnglesScore';
+import ScoreCircle from './shared/components/ScoreCircle/ScoreCircle';
 
 export default function Pose() {
   const webcamRef = useRef<Webcam>(null);
@@ -19,7 +17,6 @@ export default function Pose() {
   const [posePredictor, setPosePredictor] = useState<PosePredictor | undefined>(undefined);
   const [poses, setPoses] = useState<Pose[]>([]);
   const [posePrediction, setPosePrediction] = useState<PosePrediction | undefined>(undefined);
-  const [poseAngles, setPoseAngles] = useState<PoseAngles | undefined>(undefined);
 
   useEffect(() => {
     async function fetchCamera() {
@@ -41,7 +38,6 @@ export default function Pose() {
         const loop = async () => {
           poseDetector.renderResult().then((poses) => {
             setPoses(poses);
-            setPoseAngles(calculatePoseAngles(poses[0]));
           });
           requestAnimationFrame(loop);
         };
@@ -70,29 +66,28 @@ export default function Pose() {
   let score = 0;
   if (poses.length > 0 && posePrediction) {
     const poseAngles = calculatePoseAngles(poses[0]);
-    const poseAnglesFlipped = flipPoseAngles(poseAngles);
     const perfectAngles = getPerfectPoseAngles(posePrediction);
-    const score1 = calculatePoseScore(poseAngles, perfectAngles);
-    const score2 = calculatePoseScore(poseAnglesFlipped, perfectAngles);
-    if (score1 > score2) {
-      score = Math.round(score1);
-    } else {
-      score = Math.round(score1);
-    }
+    const scoreFloat = calculatePoseScore(poseAngles, perfectAngles);
+    score = Math.round(scoreFloat);
   }
+
+  const videoConstraints: MediaTrackConstraints = {
+    facingMode: 'user',
+  };
   return (
-    <main>
-      <div className="flex min-h-screen flex-col items-center justify-between p-24">
+    <main className="overflow-hidden">
+      <div className="flex max-h-screen overflow-hidden flex-col items-center justify-between">
         <Webcam
           id="video"
-          className="relative"
+          className="relative min-w-full"
           ref={webcamRef}
           onUserMedia={(userMedia) => setUserMedia(userMedia)}
           mirrored
+          videoConstraints={videoConstraints}
         />
         {webcamRef.current?.video && (
           <LandMarkCanvas
-            className="absolute -scale-x-100"
+            className="absolute -scale-x-100 w-full"
             poses={poses}
             posePrediction={posePrediction}
             video={webcamRef.current.video}
@@ -101,7 +96,7 @@ export default function Pose() {
           />
         )}
       </div>
-      <div className="fixed top-0 left-10 text-6xl">{score}</div>
+      <ScoreCircle score={score} className="fixed top-0 left-10" />
     </main>
   );
 }
