@@ -22,6 +22,7 @@ export class RendererCanvas2d {
   _scaleY: number;
   _offsetX: number;
   _offsetY: number;
+  _exludedLandmarkIds: number[];
 
   constructor(canvas: HTMLCanvasElement) {
     const ctx = canvas.getContext('2d');
@@ -40,6 +41,7 @@ export class RendererCanvas2d {
     this._scaleY = 1;
     this._offsetX = 0;
     this._offsetY = 0;
+    this._exludedLandmarkIds = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 17, 18, 19, 20, 21, 22];
   }
 
   draw(video: HTMLVideoElement, poses: Pose[]) {
@@ -122,18 +124,21 @@ export class RendererCanvas2d {
     this._canvasContext.fillStyle = 'Red';
     this._canvasContext.strokeStyle = 'White';
     this._canvasContext.lineWidth = this._DEFAULT_LINE_WIDTH;
+    const filteredKeypointsMiddle = keypointInd.middle.filter((id) => !this._exludedLandmarkIds.includes(id));
+    const filteredKeypointsLeft = keypointInd.left.filter((id) => !this._exludedLandmarkIds.includes(id));
+    const filteredKeypointsRight = keypointInd.right.filter((id) => !this._exludedLandmarkIds.includes(id));
 
-    for (const i of keypointInd.middle) {
+    for (const i of filteredKeypointsMiddle) {
       this.drawKeypoint(keypoints[i]);
     }
 
     this._canvasContext.fillStyle = 'Green';
-    for (const i of keypointInd.left) {
+    for (const i of filteredKeypointsLeft) {
       this.drawKeypoint(keypoints[i]);
     }
 
     this._canvasContext.fillStyle = 'Orange';
-    for (const i of keypointInd.right) {
+    for (const i of filteredKeypointsRight) {
       this.drawKeypoint(keypoints[i]);
     }
   }
@@ -169,6 +174,7 @@ export class RendererCanvas2d {
     this._canvasContext.lineWidth = this._DEFAULT_LINE_WIDTH;
 
     posedetection.util.getAdjacentPairs(this._model).forEach(([i, j]) => {
+      if (this._exludedLandmarkIds.includes(i) || this._exludedLandmarkIds.includes(j)) return;
       const kp1 = keypoints[i];
       const kp2 = keypoints[j];
 

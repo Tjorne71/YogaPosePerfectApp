@@ -1,15 +1,19 @@
 import math from 'mathjs';
 import { Coordinate3D } from '../model/Coordinate3D';
+import { Keypoint } from '@tensorflow-models/pose-detection/dist/types';
 
-function length(coordinate3D: Coordinate3D): number {
+function length(coordinate3D: Keypoint): number {
   return Math.sqrt(coordinate3D.x ** 2 + coordinate3D.y ** 2 + coordinate3D.y ** 2);
 }
 
-function dotproduct(coordinate3D: Coordinate3D, coordinate3D_2: Coordinate3D): number {
+function dotproduct(coordinate3D: Keypoint, coordinate3D_2: Keypoint): number {
   return coordinate3D.x * coordinate3D_2.x + coordinate3D.y * coordinate3D_2.y + coordinate3D.y * coordinate3D_2.y;
 }
 
-export function calculate_angle(point1: Coordinate3D, targetPoint: Coordinate3D, point3: Coordinate3D): number {
+export function calculateAngle(point1: Keypoint, targetPoint: Keypoint, point3: Keypoint): number {
+  if (!point1.z || !targetPoint.z || !point3.z) {
+    return 0;
+  }
   const v1: Coordinate3D = { x: point1.x - targetPoint.x, y: point1.y - targetPoint.y, z: point1.z - targetPoint.z };
 
   const v2: Coordinate3D = { x: point3.x - targetPoint.x, y: point3.y - targetPoint.y, z: point3.z - targetPoint.z };

@@ -5,6 +5,10 @@ import { PoseDetector } from '@/app/pose_detection/poseDetector';
 import { Pose } from '@tensorflow-models/pose-detection';
 import LandMarkCanvas from '@/app/shared/components/LandMarkCanvas/LandMarkCanvas';
 import { PosePrediction, PosePredictor } from '@/app/pose_detection/posePredictor';
+import { calculatePoseAngles } from './util/calculatePoseAngles';
+import { getPerfectPoseAngles } from './util/getPerfectPoseAngles';
+import { calculatePoseScore } from './util/calculatePoseAnglesScore';
+import ScoreCircle from './shared/components/ScoreCircle/ScoreCircle';
 
 export default function Pose() {
   const webcamRef = useRef<Webcam>(null);
@@ -59,25 +63,40 @@ export default function Pose() {
     }
     handlePoseStream();
   }, [posePredictor]);
+  let score = 0;
+  if (poses.length > 0 && posePrediction) {
+    const poseAngles = calculatePoseAngles(poses[0]);
+    const perfectAngles = getPerfectPoseAngles(posePrediction);
+    const scoreFloat = calculatePoseScore(poseAngles, perfectAngles);
+    score = Math.round(scoreFloat);
+  }
+
+  const videoConstraints: MediaTrackConstraints = {
+    facingMode: 'user',
+  };
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <Webcam
-        id="video"
-        className="relative"
-        ref={webcamRef}
-        onUserMedia={(userMedia) => setUserMedia(userMedia)}
-        mirrored
-      />
-      {webcamRef.current?.video && (
-        <LandMarkCanvas
-          className="absolute -scale-x-100"
-          poses={poses}
-          posePrediction={posePrediction}
-          video={webcamRef.current.video}
-          canvasHeight={webcamRef.current.video.offsetHeight}
-          canvasWidth={webcamRef.current.video.offsetWidth}
+    <main className="overflow-hidden">
+      <div className="flex max-h-screen overflow-hidden flex-col items-center justify-between">
+        <Webcam
+          id="video"
+          className="relative min-w-full"
+          ref={webcamRef}
+          onUserMedia={(userMedia) => setUserMedia(userMedia)}
+          mirrored
+          videoConstraints={videoConstraints}
         />
-      )}
+        {webcamRef.current?.video && (
+          <LandMarkCanvas
+            className="absolute -scale-x-100 w-full"
+            poses={poses}
+            posePrediction={posePrediction}
+            video={webcamRef.current.video}
+            canvasHeight={webcamRef.current.video.offsetHeight}
+            canvasWidth={webcamRef.current.video.offsetWidth}
+          />
+        )}
+      </div>
+      <ScoreCircle score={score} className="fixed top-0 left-10" />
     </main>
   );
 }
