@@ -9,6 +9,7 @@ import { calculatePoseAngles } from './util/calculatePoseAngles';
 import { getPerfectPoseAngles } from './util/getPerfectPoseAngles';
 import { calculatePoseScore } from './util/calculatePoseAnglesScore';
 import ScoreCircle from './shared/components/ScoreCircle/ScoreCircle';
+import { FullScreen, useFullScreenHandle } from "react-full-screen";
 
 export default function Pose() {
   const webcamRef = useRef<Webcam>(null);
@@ -17,6 +18,21 @@ export default function Pose() {
   const [posePredictor, setPosePredictor] = useState<PosePredictor | undefined>(undefined);
   const [poses, setPoses] = useState<Pose[]>([]);
   const [posePrediction, setPosePrediction] = useState<PosePrediction | undefined>(undefined);
+  const [isLandscape, setIsLandscape] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const handle = useFullScreenHandle();
+
+  useEffect(() => {
+    const onResize = () => {
+      setIsLandscape(window.innerWidth > window.innerHeight);
+    };
+
+    // Add event listener for resize
+    window.addEventListener('resize', onResize);
+    setIsLandscape(window.innerWidth > window.innerHeight);
+    // Clean up
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
 
   useEffect(() => {
     async function fetchCamera() {
@@ -27,6 +43,7 @@ export default function Pose() {
         await posePredictor.init(userMedia);
         setPoseDetector(poseDetector);
         setPosePredictor(posePredictor);
+        setLoading(false);
       }
     }
     fetchCamera();
@@ -44,8 +61,8 @@ export default function Pose() {
         loop();
       }
     }
-    handlePoseStream();
-  }, [poseDetector]);
+    if(isLandscape) handlePoseStream();
+  }, [poseDetector, isLandscape]);
 
   useEffect(() => {
     function handlePoseStream() {
@@ -61,8 +78,9 @@ export default function Pose() {
         loop();
       }
     }
-    handlePoseStream();
-  }, [posePredictor]);
+    if(isLandscape) handlePoseStream();
+  }, [posePredictor, isLandscape]);
+
   let score = 0;
   if (poses.length > 0 && posePrediction) {
     const poseAngles = calculatePoseAngles(poses[0]);
@@ -75,28 +93,34 @@ export default function Pose() {
     facingMode: 'user',
   };
   return (
-    <main className="overflow-hidden">
-      <div className="flex max-h-screen overflow-hidden flex-col items-center justify-between">
-        <Webcam
-          id="video"
-          className="relative min-w-full"
-          ref={webcamRef}
-          onUserMedia={(userMedia) => setUserMedia(userMedia)}
-          mirrored
-          videoConstraints={videoConstraints}
-        />
-        {webcamRef.current?.video && (
-          <LandMarkCanvas
-            className="absolute -scale-x-100 w-full"
-            poses={poses}
-            posePrediction={posePrediction}
-            video={webcamRef.current.video}
-            canvasHeight={webcamRef.current.video.offsetHeight}
-            canvasWidth={webcamRef.current.video.offsetWidth}
-          />
-        )}
-      </div>
-      <ScoreCircle score={score} className="fixed top-0 left-10" />
+    <main className="overflow-hidden bg-gradient-to-r from-indigo-500 to-white2">
+      {!isLandscape &&
+        <div className='justify-center items-center h-screen w-screen absolute z-10 flex bg-white'>
+          <p className='text-2xl text-black'>{loading ? "Loading ..." : "Please switch to landscape !"}</p>
+        </div> 
+      }
+      <FullScreen handle={handle}>
+        <div className={`flex overflow-hidden flex-col items-center justify-between h-screen w-screen`}>
+          <Webcam
+            id="video"
+            className="relative h-full rounded-xl border-white border-4"
+            ref={webcamRef}
+            onUserMedia={(userMedia) => setUserMedia(userMedia)}
+            mirrored
+            videoConstraints={videoConstraints} />
+          {webcamRef.current?.video && (
+            <LandMarkCanvas
+              className={`absolute -scale-x-100 h-full ${isLandscape ? "absolute" : "hidden"}`}
+              poses={poses}
+              posePrediction={posePrediction}
+              video={webcamRef.current.video}
+              canvasHeight={webcamRef.current.video.videoHeight}
+              canvasWidth={webcamRef.current.video.videoWidth} />
+          )}
+        </div>
+        <ScoreCircle score={score} className="fixed top-5 left-5" />
+      </FullScreen>
+      <button className='fixed top-5 right-5 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full' onClick={handle.enter}>Open Fullscreen</button>
     </main>
   );
 }
