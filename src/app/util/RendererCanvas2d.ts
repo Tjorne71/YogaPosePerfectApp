@@ -197,30 +197,44 @@ export class RendererCanvas2d {
     });
   }
 
-  setOverlayImage(posePrediction: PosePrediction, newWidth = null) {
+  setOverlayImage(posePrediction: PosePrediction, videoWidth: number, videoHeight: number) {
     const img = new Image();
+    let scaledWidth = 0;
+    let scaledHeight = 0;
     switch (posePrediction.className) {
       case 'Downward-Facing Dog':
         img.src = downwardFacingDog.src;
+        scaledWidth = videoWidth * 0.9;
         break;
       case 'Four-Limbed Staff':
         img.src = fourLimbedStaff.src;
+        scaledWidth = videoWidth * 0.9;
         break;
       case 'Tree Pose':
         img.src = treePose.src;
+        scaledHeight = videoHeight * 0.9;
+        console.log("Tree pose");
         break;
       default:
         img.src = warrior2.src;
+        scaledHeight = videoHeight * 0.9;
         break;
     }
 
     img.onload = () => {
       this._overlayImage = img;
+      const aspectRatio = img.naturalWidth / img.naturalHeight;
+      if(scaledWidth > 0){
+        scaledHeight = scaledWidth / aspectRatio;
+      } else {
+        scaledWidth = scaledHeight * aspectRatio;
+      } 
+
 
       // Calculate the new height to maintain the aspect ratio
-      const aspectRatio = img.naturalHeight / img.naturalWidth;
-      const scaledHeight = newWidth ? newWidth * aspectRatio : img.naturalHeight;
-      const scaledWidth = newWidth ?? img.naturalWidth;
+      //const aspectRatio = img.naturalHeight / img.naturalWidth;
+      //const scaledHeight = newWidth ? newWidth * aspectRatio : img.naturalHeight;
+      //const scaledWidth = newWidth ?? img.naturalWidth;
 
       // Center the image
       this._overlayImageX = (this._videoWidth - scaledWidth) / 2; // Center horizontally

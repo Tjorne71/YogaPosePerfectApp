@@ -31,7 +31,7 @@ export default function LandMarkCanvas({
       setRendererCanvas2d(new RendererCanvas2d(canvas));
     } else {
       if (posePrediction) {
-        rendererCanvas2d.setOverlayImage(posePrediction);
+        rendererCanvas2d.setOverlayImage(posePrediction, video.videoWidth, video.videoHeight);
       }
       rendererCanvas2d.draw(video, poses);
     }
