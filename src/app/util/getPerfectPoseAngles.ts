@@ -12,19 +12,19 @@ export const getPerfectPoseAngles = (posePrediction: PosePrediction): PoseAngles
         angles: [
           {
             landmarkKey: 'left knee',
-            angle: 165,
+            angle: 160,
           },
           {
             landmarkKey: 'right knee',
-            angle: 165,
+            angle: 160,
           },
           {
             landmarkKey: 'left hip',
-            angle: 80,
+            angle: 85,
           },
           {
             landmarkKey: 'right hip',
-            angle: 80,
+            angle: 85,
           },
           {
             landmarkKey: 'left elbow',
@@ -36,11 +36,11 @@ export const getPerfectPoseAngles = (posePrediction: PosePrediction): PoseAngles
           },
           {
             landmarkKey: 'left ankle',
-            angle: 85,
+            angle: 100,
           },
           {
             landmarkKey: 'right ankle',
-            angle: 85,
+            angle: 100,
           },
         ],
       };
@@ -86,35 +86,35 @@ export const getPerfectPoseAngles = (posePrediction: PosePrediction): PoseAngles
         angles: [
           {
             landmarkKey: 'left knee',
-            angle: 151,
+            angle: 80,
           },
           {
             landmarkKey: 'right knee',
-            angle: 36,
+            angle: 160,
           },
           {
             landmarkKey: 'left hip',
-            angle: 173,
+            angle: 125,
           },
           {
             landmarkKey: 'right hip',
-            angle: 117,
+            angle: 170,
           },
           {
             landmarkKey: 'left elbow',
-            angle: 173,
+            angle: 140,
           },
           {
             landmarkKey: 'right elbow',
-            angle: 117,
+            angle: 140,
           },
           {
             landmarkKey: 'left ankle',
-            angle: 173,
+            angle: 150,
           },
           {
             landmarkKey: 'right ankle',
-            angle: 117,
+            angle: 115,
           },
         ],
       };
@@ -123,19 +123,19 @@ export const getPerfectPoseAngles = (posePrediction: PosePrediction): PoseAngles
         angles: [
           {
             landmarkKey: 'left knee',
-            angle: 120,
-          },
-          {
-            landmarkKey: 'right knee',
             angle: 150,
           },
           {
+            landmarkKey: 'right knee',
+            angle: 110,
+          },
+          {
             landmarkKey: 'left hip',
-            angle: 90,
+            angle: 130,
           },
           {
             landmarkKey: 'right hip',
-            angle: 135,
+            angle: 100,
           },
           {
             landmarkKey: 'left elbow',
@@ -147,11 +147,11 @@ export const getPerfectPoseAngles = (posePrediction: PosePrediction): PoseAngles
           },
           {
             landmarkKey: 'left ankle',
-            angle: 120,
+            angle: 65,
           },
           {
             landmarkKey: 'right ankle',
-            angle: 80,
+            angle: 95,
           },
         ],
       };
