@@ -1,11 +1,12 @@
 import { PoseAngles } from '../model/PoseAngles';
-import { calculateAngleScore } from './calculateAngleScore';
+import { calculateLandmarkScore } from './calculateLandmarkScore';
 
 export const calculatePoseScore = (recordedAngles: PoseAngles, perfectAngles: PoseAngles): number => {
   let totalScore: number = 0;
   let flippedScore: number = 0;
   let totalPossibleScore: number = 0;
-  const threshold = 10;
+  const threshold = 5;
+  const acceptableRange = 25;
 
   perfectAngles.angles.forEach((perfectAngle) => {
     const recordedAngle = recordedAngles.angles.find(
@@ -17,7 +18,7 @@ export const calculatePoseScore = (recordedAngles: PoseAngles, perfectAngles: Po
     }
 
     if (recordedAngle) {
-      const angleScore = calculateAngleScore(recordedAngle.angle, perfectAngle.angle, threshold);
+      const angleScore = calculateLandmarkScore(recordedAngle.angle, perfectAngle.angle, threshold, acceptableRange);
       totalScore += angleScore;
       totalPossibleScore += 100;
     }
@@ -27,7 +28,7 @@ export const calculatePoseScore = (recordedAngles: PoseAngles, perfectAngles: Po
         (recordedAngle) => recordedAngle.landmarkKey === perfectAngle.landmarkKey
       );
       if (flippedAngle) {
-        const angleScore = calculateAngleScore(flippedAngle.angle, perfectAngle.angle, threshold);
+        const angleScore = calculateLandmarkScore(flippedAngle.angle, perfectAngle.angle, threshold, acceptableRange);
         flippedScore += angleScore;
       }
     }

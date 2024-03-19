@@ -48,7 +48,6 @@ function getRelatedLandmarks(landmarkKey: keyof typeof landmarkIndexes): Landmar
 export function calculatePoseAngles(pose: Pose): PoseAngles {
   const poseAngles: PoseAngles = {
     angles: [],
-    flippedAngles: [],
   };
   const keypoints = pose.keypoints3D || pose.keypoints;
   Object.keys(landmarkIndexes).map((landmarkKeyRaw) => {
@@ -66,21 +65,6 @@ export function calculatePoseAngles(pose: Pose): PoseAngles {
         angle: angle,
         visibilityScore: keypoints[landmarkIndexes[landmarkRelation.target]].score,
       });
-    }
-    const flippedLandmarkRelation = getRelatedLandmarks(flipLandmark(landmarkKey));
-    if (flippedLandmarkRelation) {
-      const flippedAngle = calculateAngle(
-        keypoints[landmarkIndexes[flippedLandmarkRelation.landmark1]],
-        keypoints[landmarkIndexes[flippedLandmarkRelation.target]],
-        keypoints[landmarkIndexes[flippedLandmarkRelation.landmark2]]
-      );
-      if (poseAngles.flippedAngles) {
-        poseAngles.flippedAngles.push({
-          landmarkKey: flippedLandmarkRelation.target,
-          angle: flippedAngle,
-          visibilityScore: keypoints[landmarkIndexes[flippedLandmarkRelation.target]].score,
-        });
-      }
     }
   });
   return poseAngles;
