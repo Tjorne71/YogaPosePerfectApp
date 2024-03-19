@@ -132,7 +132,7 @@ export class RendererCanvas2d {
       this.drawKeypoint(keypoints[i]);
     }
 
-    this._canvasContext.fillStyle = 'Green';
+    this._canvasContext.fillStyle = 'Red';
     for (const i of filteredKeypointsLeft) {
       this.drawKeypoint(keypoints[i]);
     }
@@ -197,14 +197,14 @@ export class RendererCanvas2d {
     });
   }
 
-  setOverlayImage(posePrediction: PosePrediction, videoWidth: number, videoHeight: number) {
+  setOverlayImage(posePrediction: PosePrediction, videoWidth: number, videoHeight: number, endPosX: number, endPosY: number) {
     const img = new Image();
     let scaledWidth = 0;
     let scaledHeight = 0;
     switch (posePrediction.className) {
       case 'Downward-Facing Dog':
         img.src = downwardFacingDog.src;
-        scaledWidth = videoWidth * 0.9;
+        scaledWidth = videoWidth * 0.7;
         break;
       case 'Four-Limbed Staff':
         img.src = fourLimbedStaff.src;
@@ -212,12 +212,12 @@ export class RendererCanvas2d {
         break;
       case 'Tree Pose':
         img.src = treePose.src;
-        scaledHeight = videoHeight * 0.9;
+        scaledHeight = videoHeight*0.9;
         console.log("Tree pose");
         break;
       default:
         img.src = warrior2.src;
-        scaledHeight = videoHeight * 0.9;
+        scaledHeight = videoHeight*0.7;
         break;
     }
 
@@ -238,7 +238,7 @@ export class RendererCanvas2d {
 
       // Center the image
       this._overlayImageX = (this._videoWidth - scaledWidth) / 2; // Center horizontally
-      this._overlayImageY = (this._videoHeight - scaledHeight) / 2; // Center vertically
+      this._overlayImageY = Math.max(endPosY - scaledHeight, 0); // Start the image from the bottom of the video
 
       this._overlayImageWidth = scaledWidth;
       this._overlayImageHeight = scaledHeight;
