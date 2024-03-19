@@ -1,6 +1,6 @@
 'use client';
 import React, { useEffect, useRef, useState } from 'react';
-import { Pose } from '@tensorflow-models/pose-detection';
+import { Keypoint, Pose } from '@tensorflow-models/pose-detection';
 import { RendererCanvas2d } from '@/app/util/RendererCanvas2d';
 import { PosePrediction } from '@/app/pose_detection/posePredictor';
 
@@ -31,7 +31,10 @@ export default function LandMarkCanvas({
       setRendererCanvas2d(new RendererCanvas2d(canvas));
     } else {
       if (posePrediction) {
-        rendererCanvas2d.setOverlayImage(posePrediction, video.videoWidth, video.videoHeight);
+        //const personHeight = calculateHeightFromPose(poses[0].keypoints);
+        const endPosX = poses[0].keypoints[32].y;
+        const endPosY = poses[0].keypoints[32].y;
+        rendererCanvas2d.setOverlayImage(posePrediction, video.videoWidth, video.videoHeight, endPosX, endPosY);
       }
       rendererCanvas2d.draw(video, poses);
     }
@@ -39,3 +42,25 @@ export default function LandMarkCanvas({
 
   return <canvas className={className} width={canvasWidth} height={canvasHeight} ref={canvasRef} />;
 }
+
+/* function calculateHeightFromPose(keypoints: Keypoint[]): number {
+  // Find the nose keypoint for the top of the head.
+  const nose = keypoints.find(kp => kp.name === "nose");
+
+  // Find the lowest foot keypoint.
+  const footPoints = ["left_heel", "right_heel", "left_foot_index", "right_foot_index"];
+  const feet = keypoints.filter(kp => footPoints.includes(kp.name ?? "unknown"));
+
+  if (!nose || feet.length === 0) {
+      throw new Error("Required keypoints are missing.");
+  }
+
+  // Assuming an upright pose, find the foot keypoint with the maximum `y` value.
+  const lowestFoot = feet.reduce((lowest, current) => (current.y > lowest.y ? current : lowest), feet[0]);
+
+  // Calculate the vertical distance from the nose to the lowest foot.
+  // This assumes the person is upright and ignores any x-axis differences.
+  const height = Math.abs(lowestFoot.y - nose.y);
+
+  return height;
+} */
