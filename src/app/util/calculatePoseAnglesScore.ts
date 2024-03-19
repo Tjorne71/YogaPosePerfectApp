@@ -5,14 +5,20 @@ export const calculatePoseScore = (recordedAngles: PoseAngles, perfectAngles: Po
   let totalScore: number = 0;
   let flippedScore: number = 0;
   let totalPossibleScore: number = 0;
+  const threshold = 5;
+  const acceptableRange = 25;
 
   perfectAngles.angles.forEach((perfectAngle) => {
     const recordedAngle = recordedAngles.angles.find(
       (recordedAngle) => recordedAngle.landmarkKey === perfectAngle.landmarkKey
     );
 
+    if (recordedAngle?.landmarkKey === 'left elbow') {
+      console.log(recordedAngle.visibilityScore);
+    }
+
     if (recordedAngle) {
-      const angleScore = calculateLandmarkScore(recordedAngle.angle, perfectAngle.angle, 5, 20);
+      const angleScore = calculateLandmarkScore(recordedAngle.angle, perfectAngle.angle, threshold, acceptableRange);
       totalScore += angleScore;
       totalPossibleScore += 100;
     }
@@ -22,7 +28,7 @@ export const calculatePoseScore = (recordedAngles: PoseAngles, perfectAngles: Po
         (recordedAngle) => recordedAngle.landmarkKey === perfectAngle.landmarkKey
       );
       if (flippedAngle) {
-        const angleScore = calculateLandmarkScore(flippedAngle.angle, perfectAngle.angle, 5, 20);
+        const angleScore = calculateLandmarkScore(flippedAngle.angle, perfectAngle.angle, threshold, acceptableRange);
         flippedScore += angleScore;
       }
     }

@@ -9,7 +9,8 @@ import { calculatePoseAngles } from './util/calculatePoseAngles';
 import { getPerfectPoseAngles } from './util/getPerfectPoseAngles';
 import { calculatePoseScore } from './util/calculatePoseAnglesScore';
 import ScoreCircle from './shared/components/ScoreCircle/ScoreCircle';
-import { FullScreen, useFullScreenHandle } from "react-full-screen";
+import { FullScreen, useFullScreenHandle } from 'react-full-screen';
+import PoseAnglesTable from './shared/components/PoseAngles/PoseAngles';
 
 export default function Pose() {
   const webcamRef = useRef<Webcam>(null);
@@ -61,7 +62,7 @@ export default function Pose() {
         loop();
       }
     }
-    if(isLandscape) handlePoseStream();
+    if (isLandscape) handlePoseStream();
   }, [poseDetector, isLandscape]);
 
   useEffect(() => {
@@ -78,7 +79,7 @@ export default function Pose() {
         loop();
       }
     }
-    if(isLandscape) handlePoseStream();
+    if (isLandscape) handlePoseStream();
   }, [posePredictor, isLandscape]);
 
   let score = 0;
@@ -94,11 +95,11 @@ export default function Pose() {
   };
   return (
     <main className="overflow-hidden bg-gradient-to-r from-indigo-500 to-white2">
-      {!isLandscape &&
-        <div className='justify-center items-center h-screen w-screen absolute z-10 flex bg-white'>
-          <p className='text-2xl text-black'>{loading ? "Loading ..." : "Please switch to landscape !"}</p>
-        </div> 
-      }
+      {!isLandscape && (
+        <div className="justify-center items-center h-screen w-screen absolute z-10 flex bg-white">
+          <p className="text-2xl text-black">{loading ? 'Loading ...' : 'Please switch to landscape !'}</p>
+        </div>
+      )}
       <FullScreen handle={handle}>
         <div className={`flex overflow-hidden flex-col items-center justify-between h-screen w-screen`}>
           <Webcam
@@ -107,20 +108,35 @@ export default function Pose() {
             ref={webcamRef}
             onUserMedia={(userMedia) => setUserMedia(userMedia)}
             mirrored
-            videoConstraints={videoConstraints} />
+            videoConstraints={videoConstraints}
+          />
           {webcamRef.current?.video && (
             <LandMarkCanvas
-              className={`absolute -scale-x-100 h-full ${isLandscape ? "absolute" : "hidden"}`}
+              className={`absolute -scale-x-100 h-full ${isLandscape ? 'absolute' : 'hidden'}`}
               poses={poses}
               posePrediction={posePrediction}
               video={webcamRef.current.video}
               canvasHeight={webcamRef.current.video.videoHeight}
-              canvasWidth={webcamRef.current.video.videoWidth} />
+              canvasWidth={webcamRef.current.video.videoWidth}
+            />
           )}
         </div>
-        <ScoreCircle score={score} className="fixed top-5 left-5" />
+        <div className="fixed top-5 left-5">
+          <ScoreCircle score={score} />
+          {poses.length > 0 && posePrediction && (
+            <PoseAnglesTable
+              poseAngles={calculatePoseAngles(poses[0])}
+              poseAnglesGoal={getPerfectPoseAngles(posePrediction)}
+            />
+          )}
+        </div>
       </FullScreen>
-      <button className='fixed top-5 right-5 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full' onClick={handle.enter}>Open Fullscreen</button>
+      <button
+        className="fixed top-5 right-5 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
+        onClick={handle.enter}
+      >
+        Open Fullscreen
+      </button>
     </main>
   );
 }

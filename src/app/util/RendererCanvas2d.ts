@@ -41,7 +41,7 @@ export class RendererCanvas2d {
     this._scaleY = 1;
     this._offsetX = 0;
     this._offsetY = 0;
-    this._exludedLandmarkIds = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 17, 18, 19, 20, 21, 22];
+    this._exludedLandmarkIds = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 17, 18, 19, 20, 21, 22, 29, 30, 31, 32];
   }
 
   draw(video: HTMLVideoElement, poses: Pose[]) {
@@ -213,7 +213,7 @@ export class RendererCanvas2d {
       case 'Tree Pose':
         img.src = treePose.src;
         scaledHeight = videoHeight * 0.9;
-        console.log("Tree pose");
+        console.log('Tree pose');
         break;
       default:
         img.src = warrior2.src;
@@ -224,12 +224,11 @@ export class RendererCanvas2d {
     img.onload = () => {
       this._overlayImage = img;
       const aspectRatio = img.naturalWidth / img.naturalHeight;
-      if(scaledWidth > 0){
+      if (scaledWidth > 0) {
         scaledHeight = scaledWidth / aspectRatio;
       } else {
         scaledWidth = scaledHeight * aspectRatio;
-      } 
-
+      }
 
       // Calculate the new height to maintain the aspect ratio
       //const aspectRatio = img.naturalHeight / img.naturalWidth;

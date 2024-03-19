@@ -34,14 +34,14 @@ export const getPerfectPoseAngles = (posePrediction: PosePrediction): PoseAngles
             landmarkKey: 'right elbow',
             angle: 135,
           },
-          {
-            landmarkKey: 'left ankle',
-            angle: 100,
-          },
-          {
-            landmarkKey: 'right ankle',
-            angle: 100,
-          },
+          // {
+          //   landmarkKey: 'left ankle',
+          //   angle: 100,
+          // },
+          // {
+          //   landmarkKey: 'right ankle',
+          //   angle: 100,
+          // },
         ],
       };
     case 'Four-Limbed Staff':
@@ -71,34 +71,42 @@ export const getPerfectPoseAngles = (posePrediction: PosePrediction): PoseAngles
             landmarkKey: 'right elbow',
             angle: 86,
           },
-          {
-            landmarkKey: 'left ankle',
-            angle: 86,
-          },
-          {
-            landmarkKey: 'right ankle',
-            angle: 86,
-          },
+          // {
+          //   landmarkKey: 'left ankle',
+          //   angle: 86,
+          // },
+          // {
+          //   landmarkKey: 'right ankle',
+          //   angle: 86,
+          // },
         ],
       };
     case 'Tree Pose':
       return {
         angles: [
           {
-            landmarkKey: 'left knee',
-            angle: 80,
+            landmarkKey: 'left shoulder',
+            angle: 165,
           },
           {
-            landmarkKey: 'right knee',
+            landmarkKey: 'right shoulder',
+            angle: 165,
+          },
+          {
+            landmarkKey: 'left knee',
             angle: 160,
           },
           {
+            landmarkKey: 'right knee',
+            angle: 80,
+          },
+          {
             landmarkKey: 'left hip',
-            angle: 125,
+            angle: 170,
           },
           {
             landmarkKey: 'right hip',
-            angle: 170,
+            angle: 125,
           },
           {
             landmarkKey: 'left elbow',
@@ -108,14 +116,14 @@ export const getPerfectPoseAngles = (posePrediction: PosePrediction): PoseAngles
             landmarkKey: 'right elbow',
             angle: 140,
           },
-          {
-            landmarkKey: 'left ankle',
-            angle: 150,
-          },
-          {
-            landmarkKey: 'right ankle',
-            angle: 115,
-          },
+          // {
+          //   landmarkKey: 'right ankle',
+          //   angle: 125,
+          // },
+          // {
+          //   landmarkKey: 'left ankle',
+          //   angle: 125,
+          // },
         ],
       };
     case 'Warrior 2':
@@ -145,14 +153,14 @@ export const getPerfectPoseAngles = (posePrediction: PosePrediction): PoseAngles
             landmarkKey: 'right elbow',
             angle: 165,
           },
-          {
-            landmarkKey: 'left ankle',
-            angle: 65,
-          },
-          {
-            landmarkKey: 'right ankle',
-            angle: 95,
-          },
+          // {
+          //   landmarkKey: 'left ankle',
+          //   angle: 65,
+          // },
+          // {
+          //   landmarkKey: 'right ankle',
+          //   angle: 95,
+          // },
         ],
       };
     default:
