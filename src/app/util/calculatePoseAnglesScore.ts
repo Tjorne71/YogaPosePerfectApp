@@ -13,10 +13,6 @@ export const calculatePoseScore = (recordedAngles: PoseAngles, perfectAngles: Po
       (recordedAngle) => recordedAngle.landmarkKey === perfectAngle.landmarkKey
     );
 
-    if (recordedAngle?.landmarkKey === 'left elbow') {
-      console.log(recordedAngle.visibilityScore);
-    }
-
     if (recordedAngle) {
       const angleScore = calculateLandmarkScore(recordedAngle.angle, perfectAngle.angle, threshold, acceptableRange);
       totalScore += angleScore;

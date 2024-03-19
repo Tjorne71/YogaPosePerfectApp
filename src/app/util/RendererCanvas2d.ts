@@ -44,7 +44,7 @@ export class RendererCanvas2d {
     this._exludedLandmarkIds = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 17, 18, 19, 20, 21, 22, 29, 30, 31, 32];
   }
 
-  draw(video: HTMLVideoElement, poses: Pose[]) {
+  draw(video: HTMLVideoElement, poses: Pose[], drawOverlayImage?: boolean) {
     this.draw_canvasContext(video);
 
     // The null check makes sure the UI is not in the middle of changing to a
@@ -53,7 +53,9 @@ export class RendererCanvas2d {
     if (poses && poses.length > 0) {
       this.drawResults(poses);
     }
-    this.drawOverlayImage();
+    if (drawOverlayImage) {
+      this.drawOverlayImage();
+    }
   }
 
   draw_canvasContext(video: HTMLVideoElement) {
@@ -213,7 +215,6 @@ export class RendererCanvas2d {
       case 'Tree Pose':
         img.src = treePose.src;
         scaledHeight = videoHeight * 0.9;
-        console.log('Tree pose');
         break;
       default:
         img.src = warrior2.src;

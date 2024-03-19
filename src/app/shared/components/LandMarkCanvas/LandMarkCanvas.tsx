@@ -10,6 +10,7 @@ interface LandMarkCanvasProps {
   video: HTMLVideoElement;
   canvasWidth: number;
   canvasHeight: number;
+  drawPosePrediction?: boolean;
   className?: string;
 }
 
@@ -19,6 +20,7 @@ export default function LandMarkCanvas({
   video,
   canvasWidth,
   canvasHeight,
+  drawPosePrediction,
   className,
 }: LandMarkCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -33,9 +35,9 @@ export default function LandMarkCanvas({
       if (posePrediction) {
         rendererCanvas2d.setOverlayImage(posePrediction, video.videoWidth, video.videoHeight);
       }
-      rendererCanvas2d.draw(video, poses);
+      rendererCanvas2d.draw(video, poses, drawPosePrediction);
     }
-  }, [poses, video, rendererCanvas2d, posePrediction]);
+  }, [poses, video, rendererCanvas2d, posePrediction, drawPosePrediction]);
 
   return <canvas className={className} width={canvasWidth} height={canvasHeight} ref={canvasRef} />;
 }

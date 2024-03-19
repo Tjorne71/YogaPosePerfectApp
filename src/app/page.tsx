@@ -8,9 +8,9 @@ import { PosePrediction, PosePredictor } from '@/app/pose_detection/posePredicto
 import { calculatePoseAngles } from './util/calculatePoseAngles';
 import { getPerfectPoseAngles } from './util/getPerfectPoseAngles';
 import { calculatePoseScore } from './util/calculatePoseAnglesScore';
-import ScoreCircle from './shared/components/ScoreCircle/ScoreCircle';
 import { FullScreen, useFullScreenHandle } from 'react-full-screen';
-import PoseAnglesTable from './shared/components/PoseAngles/PoseAngles';
+import PoseData from './shared/components/PoseData/PoseData';
+import DebugTable from './shared/components/DebugTable/DebugTable';
 
 export default function Pose() {
   const webcamRef = useRef<Webcam>(null);
@@ -68,10 +68,19 @@ export default function Pose() {
   useEffect(() => {
     function handlePoseStream() {
       if (posePredictor) {
+        let lastPrediction: PosePrediction | undefined;
+        let samePredictionCount = 0;
         const loop = async () => {
           posePredictor.predict().then((newPosePrediction) => {
             if (newPosePrediction) {
-              setPosePrediction(newPosePrediction);
+              if (lastPrediction?.className === newPosePrediction.className) {
+                samePredictionCount++;
+              } else {
+                samePredictionCount = 0;
+              }
+              if (samePredictionCount > 100 && newPosePrediction.probability > 0.96)
+                setPosePrediction(newPosePrediction);
+              lastPrediction = newPosePrediction;
             }
           });
           requestAnimationFrame(loop);
@@ -114,6 +123,7 @@ export default function Pose() {
             <LandMarkCanvas
               className={`absolute -scale-x-100 h-full ${isLandscape ? 'absolute' : 'hidden'}`}
               poses={poses}
+              drawPosePrediction={score > 35}
               posePrediction={posePrediction}
               video={webcamRef.current.video}
               canvasHeight={webcamRef.current.video.videoHeight}
@@ -121,10 +131,12 @@ export default function Pose() {
             />
           )}
         </div>
-        <div className="fixed top-5 left-5">
-          <ScoreCircle score={score} />
+
+        <PoseData score={score} className="fixed top-0 left-0" />
+        <div className="fixed bottom-5 left-5 bg-opacity-70 bg-black w-72 pl-2">
           {poses.length > 0 && posePrediction && (
-            <PoseAnglesTable
+            <DebugTable
+              posePrediction={posePrediction}
               poseAngles={calculatePoseAngles(poses[0])}
               poseAnglesGoal={getPerfectPoseAngles(posePrediction)}
             />
