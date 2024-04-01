@@ -1,9 +1,9 @@
 import { Pose, Keypoint } from '@tensorflow-models/pose-detection';
 import * as posedetection from '@tensorflow-models/pose-detection';
-import warrior2 from '@/app/assets/warrior_2.svg';
-import fourLimbedStaff from '@/app/assets/four_limbed_staff.svg';
-import treePose from '@/app/assets/tree_pose.svg';
-import downwardFacingDog from '@/app/assets/downward_facing_dog.svg';
+import warrior2 from '@/app/assets/Warrior2-Outline.svg';
+import fourLimbedStaff from '@/app/assets/FourLimbedStaff-Outline.svg';
+import treePose from '@/app/assets/Tree-Outline.svg';
+import downwardFacingDog from '@/app/assets/DownwardFacingDog-Outline.svg';
 import { PosePrediction } from '../pose_detection/posePredictor';
 
 export class RendererCanvas2d {
@@ -199,49 +199,74 @@ export class RendererCanvas2d {
     });
   }
 
-  setOverlayImage(posePrediction: PosePrediction, videoWidth: number, videoHeight: number, endPosX: number, endPosY: number) {
+  setOverlayImage(posePrediction: PosePrediction, videoWidth: number, videoHeight: number, keypoints: Keypoint[], personHeight: number) {
     const img = new Image();
-    let scaledWidth = 0;
-    let scaledHeight = 0;
+    let endPosX = 0;
+    let endPosY = 0;
+    let scaleFactor = 0;
+    let shiftFactorX = 0;
+    let shiftFactorY = 0;
+    let horizontalPose = false;
+
     switch (posePrediction.className) {
       case 'Downward-Facing Dog':
+        endPosX = keypoints[31].x;
+        endPosY = keypoints[24].y;
+        scaleFactor = 2.13;
+        shiftFactorX = 0.14;
+        shiftFactorY = 0.12;
+        horizontalPose = true;
         img.src = downwardFacingDog.src;
-        scaledWidth = videoWidth * 0.7;
         break;
       case 'Four-Limbed Staff':
+        endPosX = keypoints[31].x;
+        endPosY = keypoints[0].y;
+        scaleFactor = 1.12;
+        shiftFactorX = 0.04;
+        shiftFactorY = 0.4;
+        horizontalPose = true;
         img.src = fourLimbedStaff.src;
-        scaledWidth = videoWidth * 0.9;
         break;
       case 'Tree Pose':
+        endPosX = keypoints[31].x;
+        endPosY = keypoints[31].y;
+        scaleFactor = 1.1;
+        shiftFactorX = 0.63;
+        shiftFactorY = 0;
+        horizontalPose = false;
         img.src = treePose.src;
-        scaledHeight = videoHeight * 0.9;
         break;
       default:
+        endPosX = keypoints[32].x;
+        endPosY = keypoints[32].y;
+        scaleFactor = 1.1;
+        shiftFactorX = 0.12;
+        shiftFactorY = 0.02;
+        horizontalPose = false;
         img.src = warrior2.src;
-        scaledHeight = videoHeight*0.7;
         break;
     }
 
     img.onload = () => {
       this._overlayImage = img;
-      const aspectRatio = img.naturalWidth / img.naturalHeight;
-      if (scaledWidth > 0) {
-        scaledHeight = scaledWidth / aspectRatio;
+      
+      let aspectRatio = horizontalPose ? img.naturalHeight / img.naturalWidth : img.naturalWidth / img.naturalHeight;
+
+      let overlayWidth = personHeight * aspectRatio;
+
+      overlayWidth *= scaleFactor;
+      personHeight *= scaleFactor;
+
+      if(horizontalPose){
+        this._overlayImageX = endPosX - personHeight + (personHeight * shiftFactorX);
+        this._overlayImageY = endPosY - (overlayWidth * shiftFactorY);
       } else {
-        scaledWidth = scaledHeight * aspectRatio;
+        this._overlayImageX = endPosX - (overlayWidth * shiftFactorX);
+        this._overlayImageY = endPosY - personHeight + (personHeight * shiftFactorY);
       }
-
-      // Calculate the new height to maintain the aspect ratio
-      //const aspectRatio = img.naturalHeight / img.naturalWidth;
-      //const scaledHeight = newWidth ? newWidth * aspectRatio : img.naturalHeight;
-      //const scaledWidth = newWidth ?? img.naturalWidth;
-
-      // Center the image
-      this._overlayImageX = (this._videoWidth - scaledWidth) / 2; // Center horizontally
-      this._overlayImageY = Math.max(endPosY - scaledHeight, 0); // Start the image from the bottom of the video
-
-      this._overlayImageWidth = scaledWidth;
-      this._overlayImageHeight = scaledHeight;
+      
+      this._overlayImageWidth = horizontalPose ? personHeight : overlayWidth;
+      this._overlayImageHeight = horizontalPose ? overlayWidth : personHeight;
     };
   }
 

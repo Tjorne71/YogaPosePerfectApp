@@ -33,10 +33,8 @@ export default function LandMarkCanvas({
       setRendererCanvas2d(new RendererCanvas2d(canvas));
     } else {
       if (posePrediction) {
-        //const personHeight = calculateHeightFromPose(poses[0].keypoints);
-        const endPosX = poses[0].keypoints[32].y;
-        const endPosY = poses[0].keypoints[32].y;
-        rendererCanvas2d.setOverlayImage(posePrediction, video.videoWidth, video.videoHeight, endPosX, endPosY);
+        const personHeight = calculateHeightFromPose(poses[0].keypoints);
+        rendererCanvas2d.setOverlayImage(posePrediction, video.offsetWidth, video.offsetHeight, poses[0].keypoints, personHeight);
       }
       rendererCanvas2d.draw(video, poses, drawPosePrediction);
     }
@@ -45,7 +43,7 @@ export default function LandMarkCanvas({
   return <canvas className={className} width={canvasWidth} height={canvasHeight} ref={canvasRef} />;
 }
 
-/* function calculateHeightFromPose(keypoints: Keypoint[]): number {
+function calculateHeightFromPose(keypoints: Keypoint[]): number {
   // Find the nose keypoint for the top of the head.
   const nose = keypoints.find(kp => kp.name === "nose");
 
@@ -62,7 +60,14 @@ export default function LandMarkCanvas({
 
   // Calculate the vertical distance from the nose to the lowest foot.
   // This assumes the person is upright and ignores any x-axis differences.
-  const height = Math.abs(lowestFoot.y - nose.y);
+  const heightY = Math.abs(lowestFoot.y - nose.y);
+  const heightX = Math.abs(lowestFoot.x - nose.x);
 
-  return height;
-} */
+  if(heightY < heightX){
+    return heightX;
+  } else {
+    return heightY;
+  }
+
+
+}
