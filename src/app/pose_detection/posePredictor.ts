@@ -11,28 +11,33 @@ export interface PosePrediction {
 export class PosePredictor {
   model?: tmPose.CustomPoseNet;
   maxPredictions: number;
-  _camera: Camera | undefined;
 
   constructor() {
     this.model = undefined;
     this.maxPredictions = 0;
   }
 
-  async init(webcamStream: MediaStream) {
+  async init() {
     const modelURL = URL + 'model.json';
     const metadataURL = URL + 'metadata.json';
-
-    this._camera = await Camera.setup(webcamStream);
 
     this.model = await tmPose.load(modelURL, metadataURL);
     this.maxPredictions = this.model.getTotalClasses();
   }
 
-  async predict(): Promise<PosePrediction | undefined> {
-    if (!this._camera?.video) return;
+  async predictVideo(video: HTMLVideoElement): Promise<PosePrediction | undefined> {
     let predictions: PosePrediction[] = [];
     if (this.model != null) {
-      const { posenetOutput } = await this.model.estimatePose(this._camera.video);
+      const { posenetOutput } = await this.model.estimatePose(video);
+      predictions = await this.model.predict(posenetOutput);
+    }
+    return this.getHighestProbabilityPose(predictions);
+  }
+
+  async predictImage(image: HTMLImageElement): Promise<PosePrediction | undefined> {
+    let predictions: PosePrediction[] = [];
+    if (this.model != null) {
+      const { posenetOutput } = await this.model.estimatePose(image);
       predictions = await this.model.predict(posenetOutput);
     }
     return this.getHighestProbabilityPose(predictions);

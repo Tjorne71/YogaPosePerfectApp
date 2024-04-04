@@ -41,7 +41,7 @@ export default function Pose() {
         const poseDetector = new PoseDetector();
         const posePredictor = new PosePredictor();
         await poseDetector.init(userMedia);
-        await posePredictor.init(userMedia);
+        await posePredictor.init();
         setPoseDetector(poseDetector);
         setPosePredictor(posePredictor);
         setLoading(false);
@@ -67,11 +67,11 @@ export default function Pose() {
 
   useEffect(() => {
     function handlePoseStream() {
-      if (posePredictor) {
+      if (posePredictor && webcamRef.current?.video !== null) {
         let lastPrediction: PosePrediction | undefined;
         let samePredictionCount = 0;
         const loop = async () => {
-          posePredictor.predict().then((newPosePrediction) => {
+          posePredictor.predictVideo(webcamRef.current?.video!).then((newPosePrediction) => {
             if (newPosePrediction) {
               if (lastPrediction?.className === newPosePrediction.className) {
                 samePredictionCount++;
@@ -89,7 +89,7 @@ export default function Pose() {
       }
     }
     if (isLandscape) handlePoseStream();
-  }, [posePredictor, isLandscape]);
+  }, [posePredictor, isLandscape, webcamRef]);
 
   let score = 0;
   if (poses.length > 0 && posePrediction) {
