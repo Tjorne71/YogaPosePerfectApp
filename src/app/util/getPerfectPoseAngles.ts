@@ -12,36 +12,36 @@ export const getPerfectPoseAngles = (posePrediction: PosePrediction): PoseAngles
         angles: [
           {
             landmarkKey: 'left knee',
-            angle: 160,
+            angle: 165,
           },
           {
             landmarkKey: 'right knee',
-            angle: 160,
+            angle: 170,
           },
           {
             landmarkKey: 'left hip',
-            angle: 85,
+            angle: 80,
           },
           {
             landmarkKey: 'right hip',
-            angle: 85,
+            angle: 90,
           },
           {
             landmarkKey: 'left elbow',
-            angle: 135,
+            angle: 150,
           },
           {
             landmarkKey: 'right elbow',
-            angle: 135,
+            angle: 140,
           },
-          // {
-          //   landmarkKey: 'left ankle',
-          //   angle: 100,
-          // },
-          // {
-          //   landmarkKey: 'right ankle',
-          //   angle: 100,
-          // },
+          {
+            landmarkKey: 'left shoulder',
+            angle: 165,
+          },
+          {
+            landmarkKey: 'right shoulder',
+            angle: 165,
+          },
         ],
       };
     case 'Four-Limbed Staff':
@@ -53,32 +53,32 @@ export const getPerfectPoseAngles = (posePrediction: PosePrediction): PoseAngles
           },
           {
             landmarkKey: 'right knee',
-            angle: 165,
+            angle: 170,
           },
           {
             landmarkKey: 'left hip',
-            angle: 168,
+            angle: 165,
           },
           {
             landmarkKey: 'right hip',
-            angle: 168,
+            angle: 175,
           },
           {
             landmarkKey: 'left elbow',
-            angle: 86,
+            angle: 125,
           },
           {
             landmarkKey: 'right elbow',
-            angle: 86,
+            angle: 125,
           },
-          // {
-          //   landmarkKey: 'left ankle',
-          //   angle: 86,
-          // },
-          // {
-          //   landmarkKey: 'right ankle',
-          //   angle: 86,
-          // },
+          {
+            landmarkKey: 'left ankle',
+            angle: 105,
+          },
+          {
+            landmarkKey: 'right ankle',
+            angle: 105,
+          },
         ],
       };
     case 'Tree Pose':
@@ -86,35 +86,35 @@ export const getPerfectPoseAngles = (posePrediction: PosePrediction): PoseAngles
         angles: [
           {
             landmarkKey: 'left shoulder',
-            angle: 165,
+            angle: 30,
           },
           {
             landmarkKey: 'right shoulder',
-            angle: 165,
+            angle: 30,
           },
           {
             landmarkKey: 'left knee',
-            angle: 160,
+            angle: 150,
           },
           {
             landmarkKey: 'right knee',
-            angle: 80,
+            angle: 40,
           },
           {
             landmarkKey: 'left hip',
-            angle: 170,
+            angle: 165,
           },
           {
             landmarkKey: 'right hip',
-            angle: 125,
+            angle: 105,
           },
           {
             landmarkKey: 'left elbow',
-            angle: 140,
+            angle: 85,
           },
           {
             landmarkKey: 'right elbow',
-            angle: 140,
+            angle: 70,
           },
           // {
           //   landmarkKey: 'right ankle',
@@ -131,36 +131,36 @@ export const getPerfectPoseAngles = (posePrediction: PosePrediction): PoseAngles
         angles: [
           {
             landmarkKey: 'left knee',
-            angle: 150,
+            angle: 145,
           },
           {
             landmarkKey: 'right knee',
-            angle: 110,
+            angle: 105,
           },
           {
             landmarkKey: 'left hip',
-            angle: 130,
+            angle: 120,
           },
           {
             landmarkKey: 'right hip',
-            angle: 100,
+            angle: 90,
           },
           {
             landmarkKey: 'left elbow',
-            angle: 165,
+            angle: 170,
           },
           {
             landmarkKey: 'right elbow',
-            angle: 165,
+            angle: 155,
           },
-          // {
-          //   landmarkKey: 'left ankle',
-          //   angle: 65,
-          // },
-          // {
-          //   landmarkKey: 'right ankle',
-          //   angle: 95,
-          // },
+          {
+            landmarkKey: 'left shoulder',
+            angle: 85,
+          },
+          {
+            landmarkKey: 'right shoulder',
+            angle: 100,
+          },
         ],
       };
     default:
