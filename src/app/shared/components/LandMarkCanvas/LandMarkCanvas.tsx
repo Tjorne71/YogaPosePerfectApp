@@ -33,9 +33,8 @@ export default function LandMarkCanvas({
       setRendererCanvas2d(new RendererCanvas2d(canvas));
     } else {
       if (posePrediction) {
-        const personHeight = calculateHeightFromPose(poses[0].keypoints);
-        const downwardDogHeight = calculateHeightFromPose(poses[0].keypoints, poses[0].keypoints[24])
-        rendererCanvas2d.setOverlayImage(posePrediction, video.offsetWidth, video.offsetHeight, poses[0].keypoints, posePrediction.className === "Downward-Facing Dog" ? downwardDogHeight : personHeight);
+        const personHeight = calculateHeightFromPose(poses[0].keypoints, posePrediction);
+        rendererCanvas2d.setOverlayImage(posePrediction, video.offsetWidth, video.offsetHeight, poses[0].keypoints, personHeight);
       }
       rendererCanvas2d.draw(video, poses, drawPosePrediction);
     }
@@ -44,10 +43,12 @@ export default function LandMarkCanvas({
   return <canvas className={className} width={canvasWidth} height={canvasHeight} ref={canvasRef} />;
 }
 
-function calculateHeightFromPose(keypoints: Keypoint[], endpoint?: Keypoint): number {
-  if(endpoint === undefined){
-    // Find the nose keypoint for the top of the head.
-    endpoint = keypoints.find(kp => kp.name === "nose");
+function calculateHeightFromPose(keypoints: Keypoint[], posePrediction: PosePrediction): number {
+  var endpoint = keypoints.find(kp => kp.name === "nose");
+  if(posePrediction.className === 'Downward-Facing Dog'){
+    endpoint = keypoints[24];
+  } else if (posePrediction.className === 'Four-Limbed Staff'){
+    endpoint = keypoints[24];
   }
 
   // Find the lowest foot keypoint.

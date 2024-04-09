@@ -1,7 +1,7 @@
 import * as tmPose from '@teachablemachine/pose';
 import { Camera } from './camera';
 
-const URL = 'https://teachablemachine.withgoogle.com/models/LT_Yt3ECY/';
+const URL = 'https://teachablemachine.withgoogle.com/models/ZJ7sEYZyq/';
 
 export interface PosePrediction {
   className: string;

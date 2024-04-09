@@ -221,9 +221,9 @@ export class RendererCanvas2d {
       case 'Four-Limbed Staff':
         endPosX = keypoints[31].x;
         endPosY = keypoints[0].y;
-        scaleFactor = 1.12;
+        scaleFactor = 2.07;
         shiftFactorX = 0.04;
-        shiftFactorY = 0.4;
+        shiftFactorY = 0.42;
         horizontalPose = true;
         img.src = fourLimbedStaff.src;
         break;
