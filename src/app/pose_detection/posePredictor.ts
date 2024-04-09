@@ -33,6 +33,7 @@ export class PosePredictor {
     let predictions: PosePrediction[] = [];
     if (this.model != null) {
       const { pose, posenetOutput } = await this.model.estimatePose(this._camera.video);
+      console.log(posenetOutput);
       predictions = await this.model.predict(posenetOutput);
     }
     return this.getHighestProbabilityPose(predictions);
@@ -41,7 +42,6 @@ export class PosePredictor {
   getHighestProbabilityPose(predictions: PosePrediction[]): PosePrediction | undefined {
     if (predictions.length === 0) return;
     let highestPrediction = predictions[0];
-    console.log(predictions);
     for (const prediction of predictions) {
       if (prediction.probability > highestPrediction.probability) {
         highestPrediction = prediction;
