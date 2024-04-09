@@ -210,11 +210,11 @@ export class RendererCanvas2d {
 
     switch (posePrediction.className) {
       case 'Downward-Facing Dog':
-        endPosX = keypoints[31].x;
+        endPosX = keypoints[32].x;
         endPosY = keypoints[24].y;
-        scaleFactor = 2.13;
-        shiftFactorX = 0.14;
-        shiftFactorY = 0.12;
+        scaleFactor = 2;
+        shiftFactorX = 0.18;
+        shiftFactorY = 0.13;
         horizontalPose = true;
         img.src = downwardFacingDog.src;
         break;

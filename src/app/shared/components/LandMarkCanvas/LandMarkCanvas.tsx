@@ -34,7 +34,8 @@ export default function LandMarkCanvas({
     } else {
       if (posePrediction) {
         const personHeight = calculateHeightFromPose(poses[0].keypoints);
-        rendererCanvas2d.setOverlayImage(posePrediction, video.offsetWidth, video.offsetHeight, poses[0].keypoints, personHeight);
+        const downwardDogHeight = calculateHeightFromPose(poses[0].keypoints, poses[0].keypoints[24])
+        rendererCanvas2d.setOverlayImage(posePrediction, video.offsetWidth, video.offsetHeight, poses[0].keypoints, posePrediction.className === "Downward-Facing Dog" ? downwardDogHeight : personHeight);
       }
       rendererCanvas2d.draw(video, poses, drawPosePrediction);
     }
@@ -43,15 +44,17 @@ export default function LandMarkCanvas({
   return <canvas className={className} width={canvasWidth} height={canvasHeight} ref={canvasRef} />;
 }
 
-function calculateHeightFromPose(keypoints: Keypoint[]): number {
-  // Find the nose keypoint for the top of the head.
-  const nose = keypoints.find(kp => kp.name === "nose");
+function calculateHeightFromPose(keypoints: Keypoint[], endpoint?: Keypoint): number {
+  if(endpoint === undefined){
+    // Find the nose keypoint for the top of the head.
+    endpoint = keypoints.find(kp => kp.name === "nose");
+  }
 
   // Find the lowest foot keypoint.
   const footPoints = ["left_heel", "right_heel", "left_foot_index", "right_foot_index"];
   const feet = keypoints.filter(kp => footPoints.includes(kp.name ?? "unknown"));
 
-  if (!nose || feet.length === 0) {
+  if (!endpoint || feet.length === 0) {
       throw new Error("Required keypoints are missing.");
   }
 
@@ -60,14 +63,12 @@ function calculateHeightFromPose(keypoints: Keypoint[]): number {
 
   // Calculate the vertical distance from the nose to the lowest foot.
   // This assumes the person is upright and ignores any x-axis differences.
-  const heightY = Math.abs(lowestFoot.y - nose.y);
-  const heightX = Math.abs(lowestFoot.x - nose.x);
+  const heightY = Math.abs(lowestFoot.y - endpoint.y);
+  const heightX = Math.abs(lowestFoot.x - endpoint.x);
 
   if(heightY < heightX){
     return heightX;
   } else {
     return heightY;
   }
-
-
 }
