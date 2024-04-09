@@ -78,8 +78,11 @@ export default function Pose() {
               } else {
                 samePredictionCount = 0;
               }
-              if (samePredictionCount > 10 && newPosePrediction.probability > 0.96)
+              if (samePredictionCount > 10 && newPosePrediction.probability > 0.50) {
                 setPosePrediction(newPosePrediction);
+              } else {
+                setPosePrediction(undefined);
+              }
               lastPrediction = newPosePrediction;
             }
           });
