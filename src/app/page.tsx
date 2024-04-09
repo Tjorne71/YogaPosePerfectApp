@@ -11,7 +11,7 @@ import { calculatePoseScore } from './util/calculatePoseAnglesScore';
 import { FullScreen, useFullScreenHandle } from 'react-full-screen';
 import PoseData from './shared/components/PoseData/PoseData';
 import DebugTable from './shared/components/DebugTable/DebugTable';
-  
+
 export default function Pose() {
   const webcamRef = useRef<Webcam>(null);
   const [userMedia, setUserMedia] = useState<MediaStream | undefined>(undefined);
@@ -41,7 +41,7 @@ export default function Pose() {
         const poseDetector = new PoseDetector();
         const posePredictor = new PosePredictor();
         await poseDetector.init(userMedia);
-        await posePredictor.init(userMedia);
+        await posePredictor.init();
         setPoseDetector(poseDetector);
         setPosePredictor(posePredictor);
         setLoading(false);
@@ -78,7 +78,7 @@ export default function Pose() {
               } else {
                 samePredictionCount = 0;
               }
-              if (samePredictionCount > 10 && newPosePrediction.probability > 0.50) {
+              if (samePredictionCount > 10 && newPosePrediction.probability > 0.5) {
                 setPosePrediction(newPosePrediction);
               } else {
                 setPosePrediction(undefined);
