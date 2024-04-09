@@ -1,7 +1,7 @@
 import * as tmPose from '@teachablemachine/pose';
 import { Camera } from './camera';
 
-const URL = 'https://teachablemachine.withgoogle.com/models/ZJ7sEYZyq/';
+const URL = 'https://teachablemachine.withgoogle.com/models/Mhu-cJulf/';
 
 export interface PosePrediction {
   className: string;
@@ -41,6 +41,7 @@ export class PosePredictor {
   getHighestProbabilityPose(predictions: PosePrediction[]): PosePrediction | undefined {
     if (predictions.length === 0) return;
     let highestPrediction = predictions[0];
+    console.log(predictions);
     for (const prediction of predictions) {
       if (prediction.probability > highestPrediction.probability) {
         highestPrediction = prediction;
@@ -54,7 +55,7 @@ export class PosePredictor {
 }
 
 const mapRawClassNameToClassName: { [key: string]: string } = {
-  'Downward-Facing Do...': 'Downward-Facing Dog',
+  'Downward-Facing Dog': 'Downward-Facing Dog',
   'Four-Limbed Staff': 'Four-Limbed Staff',
   'Tree Pose': 'Tree Pose',
   'Warrior 2': 'Warrior 2',
