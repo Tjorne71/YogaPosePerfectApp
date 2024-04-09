@@ -74,6 +74,7 @@ export class PoseDetector {
         poses = await this._detector.estimatePoses(this._camera.video, {
           flipHorizontal: false,
         });
+        posedetection.calculators.keypointsToNormalizedKeypoints;
         console.log(poseFromBlazeposeToPoseNetLandmarks(poses[0]));
       } catch (error) {
         this._detector.dispose();
