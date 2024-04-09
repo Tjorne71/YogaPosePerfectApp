@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { PosePrediction, PosePredictor } from '../pose_detection/posePredictor';
 import ImageAndPrediction from '../shared/components/ImageAndPrediction/ImageAndPrediction';
 import testPoses from '@/app/assets/trainPoses.json';
+import { Colorscale } from 'react-colorscales';
 
 interface PredictionResult {
   actualPose: string;
@@ -20,6 +21,22 @@ export default function PridictionModelTest() {
   const [predictionResultsCount, setPredictionResultsCount] = useState<PredictionResultCount[]>([]);
   const [posePredictor, setPosePredictor] = useState<PosePredictor | undefined>(undefined);
   const [currentFileIndex, setCurrentFileIndex] = useState(0);
+  const viridisColorscale = [
+    '#effbff',
+    '#def5ff',
+    '#b6eeff',
+    '#75e4ff',
+    '#2cd7ff',
+    '#00c7fc',
+    '#009dd4',
+    '#007dab',
+    '#00698d',
+    '#065774',
+  ];
+  const color = (correctPercentage: number) => {
+    const index = Math.round(correctPercentage * (viridisColorscale.length - 1));
+    return viridisColorscale[index];
+  };
 
   useEffect(() => {
     async function initializePosePredictor() {
@@ -95,27 +112,34 @@ export default function PridictionModelTest() {
       <div className="grid grid-cols-5 grid-rows-5 h-1/2 w-1/2 mx-auto">
         {poses.map((actualPose) => (
           <>
-            <div>{actualPose}</div>
-            {poses.map((pridictedPose) => (
-              <div key={actualPose + pridictedPose} className="flex flex-col justify-center">
-                <span>
-                  {predictionResultsCount.find(
-                    (resultCount) =>
-                      resultCount.actualPose === actualPose && resultCount.pridictedPose === pridictedPose
-                  )?.sum || 0}
-                </span>
-                <span className="text-xs">
-                  {actualPose} , {pridictedPose}
-                </span>
-              </div>
-            ))}
+            <div className="flex flex-col justify-center items-center text-center">{actualPose}</div>
+            {poses.map((pridictedPose) => {
+              const score =
+                predictionResultsCount.find(
+                  (resultCount) => resultCount.actualPose === actualPose && resultCount.pridictedPose === pridictedPose
+                )?.sum || 0;
+              console.log(score / 30);
+              return (
+                <div
+                  key={actualPose + pridictedPose}
+                  className="flex flex-col justify-center items-center border-2 bottom-black"
+                  style={{ backgroundColor: color(score / 30) }}
+                >
+                  <span>{score}</span>
+                </div>
+              );
+            })}
           </>
         ))}
         <div></div>
         {poses.map((pridictedPose) => (
-          <div key={pridictedPose + 'x'}> {pridictedPose}</div>
+          <div key={pridictedPose + 'x'} className="flex flex-col justify-start items-center text-center">
+            {' '}
+            {pridictedPose}
+          </div>
         ))}
       </div>
+      <Colorscale colorscale={viridisColorscale} onClick={() => {}} width={150} />
     </div>
   );
 }
