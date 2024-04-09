@@ -2,7 +2,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Webcam from 'react-webcam';
 import { PoseDetector } from '@/app/pose_detection/poseDetector';
-import { Pose } from '@tensorflow-models/pose-detection';
+import * as poseDetection from '@tensorflow-models/pose-detection';
 import LandMarkCanvas from '@/app/shared/components/LandMarkCanvas/LandMarkCanvas';
 import { PosePrediction, PosePredictor } from '@/app/pose_detection/posePredictor';
 import { calculatePoseAngles } from './util/calculatePoseAngles';
@@ -11,13 +11,13 @@ import { calculatePoseScore } from './util/calculatePoseAnglesScore';
 import { FullScreen, useFullScreenHandle } from 'react-full-screen';
 import PoseData from './shared/components/PoseData/PoseData';
 import DebugTable from './shared/components/DebugTable/DebugTable';
-
+  
 export default function Pose() {
   const webcamRef = useRef<Webcam>(null);
   const [userMedia, setUserMedia] = useState<MediaStream | undefined>(undefined);
   const [poseDetector, setPoseDetector] = useState<PoseDetector | undefined>(undefined);
   const [posePredictor, setPosePredictor] = useState<PosePredictor | undefined>(undefined);
-  const [poses, setPoses] = useState<Pose[]>([]);
+  const [poses, setPoses] = useState<poseDetection.Pose[]>([]);
   const [posePrediction, setPosePrediction] = useState<PosePrediction | undefined>(undefined);
   const [isLandscape, setIsLandscape] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -78,7 +78,7 @@ export default function Pose() {
               } else {
                 samePredictionCount = 0;
               }
-              if (samePredictionCount > 100 && newPosePrediction.probability > 0.96)
+              if (samePredictionCount > 10 && newPosePrediction.probability > 0.96)
                 setPosePrediction(newPosePrediction);
               lastPrediction = newPosePrediction;
             }

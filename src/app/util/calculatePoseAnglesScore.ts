@@ -5,7 +5,7 @@ export const calculatePoseScore = (recordedAngles: PoseAngles, perfectAngles: Po
   let totalScore: number = 0;
   let flippedScore: number = 0;
   let totalPossibleScore: number = 0;
-  const threshold = 5;
+  const threshold = 10;
   const acceptableRange = 25;
 
   perfectAngles.angles.forEach((perfectAngle) => {
