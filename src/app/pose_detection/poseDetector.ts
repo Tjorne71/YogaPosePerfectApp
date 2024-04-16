@@ -29,7 +29,7 @@ import * as posedetection from '@tensorflow-models/pose-detection';
 import { Camera } from './camera';
 import * as params from './params';
 import { Pose } from '@tensorflow-models/pose-detection';
-import { poseFromBlazeposeToPoseNetLandmarks } from '../util/PoseFromBlazeposeToPoseNetLandmarks';
+import { keypointFromBlazeposeToPoseNetKeypoints } from '../util/keypointFromBlazeposeToPoseNetKeypoints';
 
 export class PoseDetector {
   _detector: posedetection.PoseDetector | undefined;
@@ -74,8 +74,11 @@ export class PoseDetector {
         poses = await this._detector.estimatePoses(this._camera.video, {
           flipHorizontal: false,
         });
-        posedetection.calculators.keypointsToNormalizedKeypoints;
-        console.log(poseFromBlazeposeToPoseNetLandmarks(poses[0]));
+        const normalizedKeypoint = posedetection.calculators.keypointsToNormalizedKeypoints(poses[0].keypoints, {
+          width: this._camera.video.offsetWidth,
+          height: this._camera.video.offsetHeight,
+        });
+        const poseNetPose = keypointFromBlazeposeToPoseNetKeypoints(normalizedKeypoint);
       } catch (error) {
         this._detector.dispose();
         this._detector = undefined;
