@@ -21,6 +21,7 @@ import '@tensorflow/tfjs-backend-webgpu';
 import * as mpPose from '@mediapipe/pose';
 import * as tfjsWasm from '@tensorflow/tfjs-backend-wasm';
 import * as tf from '@tensorflow/tfjs-core';
+import { Keypoint as PoseNetKeypoint } from '@tensorflow-models/posenet';
 
 tfjsWasm.setWasmPaths(`https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm@${tfjsWasm.version_wasm}/dist/`);
 
@@ -29,7 +30,6 @@ import * as posedetection from '@tensorflow-models/pose-detection';
 import { Camera } from './camera';
 import * as params from './params';
 import { Pose } from '@tensorflow-models/pose-detection';
-import { keypointFromBlazeposeToPoseNetKeypoints } from '../util/keypointFromBlazeposeToPoseNetKeypoints';
 
 export class PoseDetector {
   _detector: posedetection.PoseDetector | undefined;
@@ -74,11 +74,6 @@ export class PoseDetector {
         poses = await this._detector.estimatePoses(this._camera.video, {
           flipHorizontal: false,
         });
-        const normalizedKeypoint = posedetection.calculators.keypointsToNormalizedKeypoints(poses[0].keypoints, {
-          width: this._camera.video.offsetWidth,
-          height: this._camera.video.offsetHeight,
-        });
-        const poseNetPose = keypointFromBlazeposeToPoseNetKeypoints(normalizedKeypoint);
       } catch (error) {
         this._detector.dispose();
         this._detector = undefined;
@@ -93,4 +88,12 @@ export class PoseDetector {
     await this.renderResult();
     requestAnimationFrame(this.renderPrediction);
   }
+}
+
+function flattenKeypointsToArray(keypoints: PoseNetKeypoint[]): number[] {
+  const flattenedArray: number[] = [];
+  for (const keypoint of keypoints) {
+    flattenedArray.push(keypoint.position.x, keypoint.position.y);
+  }
+  return flattenedArray;
 }

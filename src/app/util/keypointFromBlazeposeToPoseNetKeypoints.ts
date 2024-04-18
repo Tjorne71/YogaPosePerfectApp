@@ -21,8 +21,7 @@ const keypointMapper = {
   16: 28, // right_ankle
 };
 
-export function keypointFromBlazeposeToPoseNetKeypoints(keypoints: BlazePoseKeypoint[]): PoseNetKeypoint[] | undefined {
-  if (keypoints === undefined) return;
+export function keypointFromBlazeposeToPoseNetKeypoints(keypoints: BlazePoseKeypoint[]): PoseNetKeypoint[] {
   const output: PoseNetKeypoint[] = [];
 
   Object.entries(keypointMapper).map(([poseNetIndex, blazePoseIndex]) => {

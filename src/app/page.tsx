@@ -67,22 +67,19 @@ export default function Pose() {
 
   useEffect(() => {
     function handlePoseStream() {
-      if (posePredictor) {
+      if (posePredictor && webcamRef.current?.video !== null) {
         let lastPrediction: PosePrediction | undefined;
         let samePredictionCount = 0;
         const loop = async () => {
-          posePredictor.predict().then((newPosePrediction) => {
+          posePredictor.predictVideo(webcamRef.current?.video!).then((newPosePrediction) => {
             if (newPosePrediction) {
               if (lastPrediction?.className === newPosePrediction.className) {
                 samePredictionCount++;
               } else {
                 samePredictionCount = 0;
               }
-              if (samePredictionCount > 10 && newPosePrediction.probability > 0.5) {
+              if (samePredictionCount > 10 && newPosePrediction.probability > 0.96)
                 setPosePrediction(newPosePrediction);
-              } else {
-                setPosePrediction(undefined);
-              }
               lastPrediction = newPosePrediction;
             }
           });
@@ -92,7 +89,7 @@ export default function Pose() {
       }
     }
     if (isLandscape) handlePoseStream();
-  }, [posePredictor, isLandscape]);
+  }, [posePredictor, isLandscape, webcamRef]);
 
   let score = 0;
   if (poses.length > 0 && posePrediction) {

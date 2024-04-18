@@ -1,7 +1,8 @@
 import * as tmPose from '@teachablemachine/pose';
 import { Camera } from './camera';
 
-const URL = 'https://teachablemachine.withgoogle.com/models/xkriSGtTU/';
+const URL = 'https://teachablemachine.withgoogle.com/models/iKZuChygt/';
+// const URL = 'https://teachablemachine.withgoogle.com/models/Mhu-cJulf/';
 
 export interface PosePrediction {
   className: string;
@@ -59,7 +60,7 @@ export class PosePredictor {
 }
 
 const mapRawClassNameToClassName: { [key: string]: string } = {
-  'Downward-Facing Dog': 'Downward-Facing Dog',
+  'Downward-Facing Do...': 'Downward-Facing Dog',
   'Four-Limbed Staff': 'Four-Limbed Staff',
   'Tree Pose': 'Tree Pose',
   'Warrior 2': 'Warrior 2',
