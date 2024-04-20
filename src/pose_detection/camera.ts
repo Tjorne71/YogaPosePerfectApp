@@ -1,10 +1,10 @@
-import { isMobile } from '@/app/util/isMobile';
+import { isMobile } from "@/util/isMobile";
 
 export class Camera {
   video: HTMLVideoElement;
 
   constructor() {
-    this.video = document.getElementById('video') as HTMLVideoElement;
+    this.video = document.getElementById("video") as HTMLVideoElement;
   }
 
   /**
@@ -13,7 +13,9 @@ export class Camera {
    */
   static async setup(webcamStream: MediaStream) {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      throw new Error('Browser API navigator.mediaDevices.getUserMedia not available');
+      throw new Error(
+        "Browser API navigator.mediaDevices.getUserMedia not available"
+      );
     }
 
     const stream = webcamStream;

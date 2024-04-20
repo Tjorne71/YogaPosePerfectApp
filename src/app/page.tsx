@@ -1,24 +1,32 @@
-'use client';
-import React, { useEffect, useRef, useState } from 'react';
-import Webcam from 'react-webcam';
-import { PoseDetector } from '@/app/pose_detection/poseDetector';
-import * as poseDetection from '@tensorflow-models/pose-detection';
-import LandMarkCanvas from '@/app/shared/components/LandMarkCanvas/LandMarkCanvas';
-import { PosePrediction, PosePredictor } from '@/app/pose_detection/posePredictor';
-import { calculatePoseAngles } from './util/calculatePoseAngles';
-import { getPerfectPoseAngles } from './util/getPerfectPoseAngles';
-import { calculatePoseScore } from './util/calculatePoseAnglesScore';
-import { FullScreen, useFullScreenHandle } from 'react-full-screen';
-import PoseData from './shared/components/PoseData/PoseData';
-import DebugTable from './shared/components/DebugTable/DebugTable';
+"use client";
+import React, { useEffect, useRef, useState } from "react";
+import Webcam from "react-webcam";
+import { PoseDetector } from "@/pose_detection/poseDetector";
+import * as poseDetection from "@tensorflow-models/pose-detection";
+import LandMarkCanvas from "@/shared/components/LandMarkCanvas/LandMarkCanvas";
+import { PosePrediction, PosePredictor } from "@/pose_detection/posePredictor";
+import { calculatePoseAngles } from "../util/calculatePoseAngles";
+import { getPerfectPoseAngles } from "../util/getPerfectPoseAngles";
+import { calculatePoseScore } from "../util/calculatePoseAnglesScore";
+import { FullScreen, useFullScreenHandle } from "react-full-screen";
+import PoseData from "../shared/components/PoseData/PoseData";
+import DebugTable from "../shared/components/DebugTable/DebugTable";
 
 export default function Pose() {
   const webcamRef = useRef<Webcam>(null);
-  const [userMedia, setUserMedia] = useState<MediaStream | undefined>(undefined);
-  const [poseDetector, setPoseDetector] = useState<PoseDetector | undefined>(undefined);
-  const [posePredictor, setPosePredictor] = useState<PosePredictor | undefined>(undefined);
+  const [userMedia, setUserMedia] = useState<MediaStream | undefined>(
+    undefined
+  );
+  const [poseDetector, setPoseDetector] = useState<PoseDetector | undefined>(
+    undefined
+  );
+  const [posePredictor, setPosePredictor] = useState<PosePredictor | undefined>(
+    undefined
+  );
   const [poses, setPoses] = useState<poseDetection.Pose[]>([]);
-  const [posePrediction, setPosePrediction] = useState<PosePrediction | undefined>(undefined);
+  const [posePrediction, setPosePrediction] = useState<
+    PosePrediction | undefined
+  >(undefined);
   const [isLandscape, setIsLandscape] = useState(false);
   const [loading, setLoading] = useState(true);
   const handle = useFullScreenHandle();
@@ -29,10 +37,10 @@ export default function Pose() {
     };
 
     // Add event listener for resize
-    window.addEventListener('resize', onResize);
+    window.addEventListener("resize", onResize);
     setIsLandscape(window.innerWidth > window.innerHeight);
     // Clean up
-    return () => window.removeEventListener('resize', onResize);
+    return () => window.removeEventListener("resize", onResize);
   }, []);
 
   useEffect(() => {
@@ -71,18 +79,23 @@ export default function Pose() {
         let lastPrediction: PosePrediction | undefined;
         let samePredictionCount = 0;
         const loop = async () => {
-          posePredictor.predictVideo(webcamRef.current?.video!).then((newPosePrediction) => {
-            if (newPosePrediction) {
-              if (lastPrediction?.className === newPosePrediction.className) {
-                samePredictionCount++;
-              } else {
-                samePredictionCount = 0;
+          posePredictor
+            .predictVideo(webcamRef.current?.video!)
+            .then((newPosePrediction) => {
+              if (newPosePrediction) {
+                if (lastPrediction?.className === newPosePrediction.className) {
+                  samePredictionCount++;
+                } else {
+                  samePredictionCount = 0;
+                }
+                if (
+                  samePredictionCount > 10 &&
+                  newPosePrediction.probability > 0.96
+                )
+                  setPosePrediction(newPosePrediction);
+                lastPrediction = newPosePrediction;
               }
-              if (samePredictionCount > 10 && newPosePrediction.probability > 0.96)
-                setPosePrediction(newPosePrediction);
-              lastPrediction = newPosePrediction;
-            }
-          });
+            });
           requestAnimationFrame(loop);
         };
         loop();
@@ -100,17 +113,21 @@ export default function Pose() {
   }
 
   const videoConstraints: MediaTrackConstraints = {
-    facingMode: 'user',
+    facingMode: "user",
   };
   return (
     <main className="overflow-hidden bg-gradient-to-r from-indigo-500 to-white2">
       {!isLandscape && (
         <div className="justify-center items-center h-screen w-screen absolute z-10 flex bg-white">
-          <p className="text-2xl text-black">{loading ? 'Loading ...' : 'Please switch to landscape !'}</p>
+          <p className="text-2xl text-black">
+            {loading ? "Loading ..." : "Please switch to landscape !"}
+          </p>
         </div>
       )}
       <FullScreen handle={handle}>
-        <div className={`flex overflow-hidden flex-col items-center justify-between h-screen w-screen`}>
+        <div
+          className={`flex overflow-hidden flex-col items-center justify-between h-screen w-screen`}
+        >
           <Webcam
             id="video"
             className="relative h-full rounded-xl border-white border-4"
@@ -121,7 +138,9 @@ export default function Pose() {
           />
           {webcamRef.current?.video && (
             <LandMarkCanvas
-              className={`absolute -scale-x-100 h-full ${isLandscape ? 'absolute' : 'hidden'}`}
+              className={`absolute -scale-x-100 h-full ${
+                isLandscape ? "absolute" : "hidden"
+              }`}
               poses={poses}
               drawPosePrediction={score > 35}
               posePrediction={posePrediction}

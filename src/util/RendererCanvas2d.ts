@@ -1,10 +1,10 @@
-import { Pose, Keypoint } from '@tensorflow-models/pose-detection';
-import * as posedetection from '@tensorflow-models/pose-detection';
-import warrior2 from '@/app/assets/Warrior2-Outline.svg';
-import fourLimbedStaff from '@/app/assets/FourLimbedStaff-Outline.svg';
-import treePose from '@/app/assets/Tree-Outline.svg';
-import downwardFacingDog from '@/app/assets/DownwardFacingDog-Outline.svg';
-import { PosePrediction } from '../pose_detection/posePredictor';
+import { Pose, Keypoint } from "@tensorflow-models/pose-detection";
+import * as posedetection from "@tensorflow-models/pose-detection";
+import warrior2 from "@/assets/Warrior2-Outline.svg";
+import fourLimbedStaff from "@/assets/FourLimbedStaff-Outline.svg";
+import treePose from "@/assets/Tree-Outline.svg";
+import downwardFacingDog from "@/assets/DownwardFacingDog-Outline.svg";
+import { PosePrediction } from "../pose_detection/posePredictor";
 
 export class RendererCanvas2d {
   _DEFAULT_LINE_WIDTH = 1;
@@ -25,9 +25,9 @@ export class RendererCanvas2d {
   _exludedLandmarkIds: number[];
 
   constructor(canvas: HTMLCanvasElement) {
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     if (ctx == null) {
-      throw Error('Fuck');
+      throw Error("Fuck");
     }
     this._canvasContext = ctx;
     this._videoWidth = canvas.width;
@@ -41,7 +41,9 @@ export class RendererCanvas2d {
     this._scaleY = 1;
     this._offsetX = 0;
     this._offsetY = 0;
-    this._exludedLandmarkIds = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 17, 18, 19, 20, 21, 22, 29, 30, 31, 32];
+    this._exludedLandmarkIds = [
+      0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 17, 18, 19, 20, 21, 22, 29, 30, 31, 32,
+    ];
   }
 
   draw(video: HTMLVideoElement, poses: Pose[], drawOverlayImage?: boolean) {
@@ -123,23 +125,29 @@ export class RendererCanvas2d {
    */
   drawKeypoints(keypoints: Keypoint[]) {
     const keypointInd = posedetection.util.getKeypointIndexBySide(this._model);
-    this._canvasContext.fillStyle = 'Red';
-    this._canvasContext.strokeStyle = 'White';
+    this._canvasContext.fillStyle = "Red";
+    this._canvasContext.strokeStyle = "White";
     this._canvasContext.lineWidth = this._DEFAULT_LINE_WIDTH;
-    const filteredKeypointsMiddle = keypointInd.middle.filter((id) => !this._exludedLandmarkIds.includes(id));
-    const filteredKeypointsLeft = keypointInd.left.filter((id) => !this._exludedLandmarkIds.includes(id));
-    const filteredKeypointsRight = keypointInd.right.filter((id) => !this._exludedLandmarkIds.includes(id));
+    const filteredKeypointsMiddle = keypointInd.middle.filter(
+      (id) => !this._exludedLandmarkIds.includes(id)
+    );
+    const filteredKeypointsLeft = keypointInd.left.filter(
+      (id) => !this._exludedLandmarkIds.includes(id)
+    );
+    const filteredKeypointsRight = keypointInd.right.filter(
+      (id) => !this._exludedLandmarkIds.includes(id)
+    );
 
     for (const i of filteredKeypointsMiddle) {
       this.drawKeypoint(keypoints[i]);
     }
 
-    this._canvasContext.fillStyle = 'Red';
+    this._canvasContext.fillStyle = "Red";
     for (const i of filteredKeypointsLeft) {
       this.drawKeypoint(keypoints[i]);
     }
 
-    this._canvasContext.fillStyle = 'Orange';
+    this._canvasContext.fillStyle = "Orange";
     for (const i of filteredKeypointsRight) {
       this.drawKeypoint(keypoints[i]);
     }
@@ -170,13 +178,17 @@ export class RendererCanvas2d {
    */
   drawSkeleton(keypoints: Keypoint[]) {
     // Each poseId is mapped to a color in the color palette.
-    const color = 'White';
+    const color = "White";
     this._canvasContext.fillStyle = color;
     this._canvasContext.strokeStyle = color;
     this._canvasContext.lineWidth = this._DEFAULT_LINE_WIDTH;
 
     posedetection.util.getAdjacentPairs(this._model).forEach(([i, j]) => {
-      if (this._exludedLandmarkIds.includes(i) || this._exludedLandmarkIds.includes(j)) return;
+      if (
+        this._exludedLandmarkIds.includes(i) ||
+        this._exludedLandmarkIds.includes(j)
+      )
+        return;
       const kp1 = keypoints[i];
       const kp2 = keypoints[j];
 
@@ -199,7 +211,13 @@ export class RendererCanvas2d {
     });
   }
 
-  setOverlayImage(posePrediction: PosePrediction, videoWidth: number, videoHeight: number, keypoints: Keypoint[], personHeight: number) {
+  setOverlayImage(
+    posePrediction: PosePrediction,
+    videoWidth: number,
+    videoHeight: number,
+    keypoints: Keypoint[],
+    personHeight: number
+  ) {
     const img = new Image();
     let endPosX = 0;
     let endPosY = 0;
@@ -209,7 +227,7 @@ export class RendererCanvas2d {
     let horizontalPose = false;
 
     switch (posePrediction.className) {
-      case 'Downward-Facing Dog':
+      case "Downward-Facing Dog":
         endPosX = keypoints[32].x;
         endPosY = keypoints[24].y;
         scaleFactor = 2;
@@ -218,7 +236,7 @@ export class RendererCanvas2d {
         horizontalPose = true;
         img.src = downwardFacingDog.src;
         break;
-      case 'Four-Limbed Staff':
+      case "Four-Limbed Staff":
         endPosX = keypoints[31].x;
         endPosY = keypoints[0].y;
         scaleFactor = 2.07;
@@ -227,7 +245,7 @@ export class RendererCanvas2d {
         horizontalPose = true;
         img.src = fourLimbedStaff.src;
         break;
-      case 'Tree Pose':
+      case "Tree Pose":
         endPosX = keypoints[31].x;
         endPosY = keypoints[31].y;
         scaleFactor = 1.1;
@@ -249,22 +267,26 @@ export class RendererCanvas2d {
 
     img.onload = () => {
       this._overlayImage = img;
-      
-      let aspectRatio = horizontalPose ? img.naturalHeight / img.naturalWidth : img.naturalWidth / img.naturalHeight;
+
+      let aspectRatio = horizontalPose
+        ? img.naturalHeight / img.naturalWidth
+        : img.naturalWidth / img.naturalHeight;
 
       let overlayWidth = personHeight * aspectRatio;
 
       overlayWidth *= scaleFactor;
       personHeight *= scaleFactor;
 
-      if(horizontalPose){
-        this._overlayImageX = endPosX - personHeight + (personHeight * shiftFactorX);
-        this._overlayImageY = endPosY - (overlayWidth * shiftFactorY);
+      if (horizontalPose) {
+        this._overlayImageX =
+          endPosX - personHeight + personHeight * shiftFactorX;
+        this._overlayImageY = endPosY - overlayWidth * shiftFactorY;
       } else {
-        this._overlayImageX = endPosX - (overlayWidth * shiftFactorX);
-        this._overlayImageY = endPosY - personHeight + (personHeight * shiftFactorY);
+        this._overlayImageX = endPosX - overlayWidth * shiftFactorX;
+        this._overlayImageY =
+          endPosY - personHeight + personHeight * shiftFactorY;
       }
-      
+
       this._overlayImageWidth = horizontalPose ? personHeight : overlayWidth;
       this._overlayImageHeight = horizontalPose ? overlayWidth : personHeight;
     };
