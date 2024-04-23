@@ -11,8 +11,8 @@ export const extendColors: ThemeConfig["colors"] = {
 export const colors: Partial<ThemeColors> = {
   primary: "#EFFDFD",
   secondary: "#017D7A",
-  default: twColors.black,
-  foreground: twColors.white,
+  default: twColors.white,
+  foreground: twColors.black,
   success: "#4AB962",
   warning: "#FAF3BD",
   danger: "#B94C4A",

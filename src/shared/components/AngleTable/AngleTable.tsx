@@ -1,25 +1,35 @@
 import { PoseAngles } from "@/model/PoseAngles";
 import { PosePrediction } from "@/pose_detection/posePredictor";
 import { calculateLandmarkScore } from "@/util/calculateLandmarkScore";
+import { cn } from "@/util/cn";
 import React from "react";
 
 interface DebugTableProps {
   poseAngles: PoseAngles;
   poseAnglesGoal: PoseAngles;
   posePrediction: PosePrediction;
+  className?: string;
 }
 
-export default function DebugTable({
+export default function AngleTable({
   poseAngles,
   poseAnglesGoal,
   posePrediction,
+  className,
 }: DebugTableProps) {
   return (
-    <div className="text-white text-lg">
-      <div>
-        <span className="font-bold">{posePrediction.className} </span>
-        <span>{Math.round(posePrediction.probability * 100)}%</span>
-      </div>
+    <table
+      className={cn(
+        "text-black bg-primary text-lg z-20 bg-opacity-70 backdrop-blur-md w-full p-5 rounded-r-lg",
+        className
+      )}
+    >
+      <tr className="text-xs text-left">
+        <th>Landmark Key</th>
+        <th>Angle</th>
+        <th>Goal Angle</th>
+        <th>Score</th>
+      </tr>
       {poseAngles.angles.map((poseAngle) => {
         const perfectAngle = poseAnglesGoal.angles.find(
           (angle) => angle.landmarkKey === poseAngle.landmarkKey
@@ -31,16 +41,14 @@ export default function DebugTable({
           (angleScore * 255) / 100
         }, 0)`;
         return (
-          <div key={poseAngle.landmarkKey}>
-            <span>{poseAngle.landmarkKey}: </span>
-            <span>{Math.round(poseAngle.angle / 5) * 5}</span>
-            {perfectAngle && <span>/ {perfectAngle.angle}</span>}
-            <span style={{ color: color }}>
-              / {Math.round(angleScore / 5) * 5}%
-            </span>
-          </div>
+          <tr key={poseAngle.landmarkKey} className="text-xs">
+            <td>{poseAngle.landmarkKey} </td>
+            <td>{Math.round(poseAngle.angle / 5) * 5}°</td>
+            <td>{perfectAngle ? perfectAngle.angle : 0}°</td>
+            <td style={{ color: color }}>{Math.round(angleScore / 5) * 5}%</td>
+          </tr>
         );
       })}
-    </div>
+    </table>
   );
 }

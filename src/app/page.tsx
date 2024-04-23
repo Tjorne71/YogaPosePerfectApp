@@ -9,10 +9,21 @@ import { calculatePoseAngles } from "../util/calculatePoseAngles";
 import { getPerfectPoseAngles } from "../util/getPerfectPoseAngles";
 import { calculatePoseScore } from "../util/calculatePoseAnglesScore";
 import { FullScreen, useFullScreenHandle } from "react-full-screen";
-import PoseData from "../shared/components/PoseData/PoseData";
-import DebugTable from "../shared/components/DebugTable/DebugTable";
+import WebcamBackground from "@/shared/components/WebcamBackground/WebcamBackground";
+import PoseData from "@/shared/components/PoseData/PoseData";
+import PoseControls from "@/shared/components/PoseControls/PoseControls";
+import YogaPosesHelperModal from "./test/page";
+import { useDisclosure } from "@nextui-org/react";
+import AngleSwitch from "@/shared/components/AngleSwitch/AngleSwitch";
+import DebugTable from "@/shared/components/AngleTable/AngleTable";
 
 export default function Pose() {
+  const {
+    isOpen: isYogaHelperOpen,
+    onOpen: onYogaHelperOpen,
+    onOpenChange: onYogaHelperOpenChange,
+  } = useDisclosure();
+  const [showAngleTable, setShowAngleTable] = useState(false);
   const webcamRef = useRef<Webcam>(null);
   const [userMedia, setUserMedia] = useState<MediaStream | undefined>(
     undefined
@@ -116,7 +127,7 @@ export default function Pose() {
     facingMode: "user",
   };
   return (
-    <main className="overflow-hidden bg-gradient-to-r from-indigo-500 to-white2">
+    <main className="overflow-hidden">
       {!isLandscape && (
         <div className="justify-center items-center h-screen w-screen absolute z-10 flex bg-white">
           <p className="text-2xl text-black">
@@ -128,17 +139,34 @@ export default function Pose() {
         <div
           className={`flex overflow-hidden flex-col items-center justify-between h-screen w-screen`}
         >
+          <PoseData
+            poseScore={score}
+            detectedPose={posePrediction?.className}
+            className="absolute left-0 top-5 z-20"
+          />
+          <PoseControls
+            openFullScreen={handle.enter}
+            closeFullScreen={handle.exit}
+            isFullScreen={handle.active}
+            onHelperOpen={onYogaHelperOpen}
+            className="absolute right-5 bottom-5 z-20"
+          />
+          <AngleSwitch
+            onValueChange={setShowAngleTable}
+            className="absolute right-0 top-5 z-20 hidden lg:flex"
+          />
           <Webcam
             id="video"
-            className="relative h-full rounded-xl border-white border-4"
+            className="h-full z-10"
             ref={webcamRef}
             onUserMedia={(userMedia) => setUserMedia(userMedia)}
             mirrored
             videoConstraints={videoConstraints}
           />
+          <WebcamBackground videoConstraints={videoConstraints} />
           {webcamRef.current?.video && (
             <LandMarkCanvas
-              className={`absolute -scale-x-100 h-full ${
+              className={`absolute -scale-x-100 h-full z-10 ${
                 isLandscape ? "absolute" : "hidden"
               }`}
               poses={poses}
@@ -150,24 +178,19 @@ export default function Pose() {
             />
           )}
         </div>
-
-        <PoseData score={score} className="fixed top-0 left-0" />
-        <div className="fixed bottom-5 left-5 bg-opacity-70 bg-black w-72 pl-2">
-          {poses.length > 0 && posePrediction && (
-            <DebugTable
-              posePrediction={posePrediction}
-              poseAngles={calculatePoseAngles(poses[0])}
-              poseAnglesGoal={getPerfectPoseAngles(posePrediction)}
-            />
-          )}
-        </div>
+        <YogaPosesHelperModal
+          isOpen={isYogaHelperOpen}
+          onOpenChange={onYogaHelperOpenChange}
+        />
+        {showAngleTable && poses.length > 0 && posePrediction && (
+          <DebugTable
+            posePrediction={posePrediction}
+            poseAngles={calculatePoseAngles(poses[0])}
+            poseAnglesGoal={getPerfectPoseAngles(posePrediction)}
+            className="absolute bottom-5 left-0 z-20 w-96 hidden lg:block"
+          />
+        )}
       </FullScreen>
-      <button
-        className="fixed top-5 right-5 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
-        onClick={handle.enter}
-      >
-        Open Fullscreen
-      </button>
     </main>
   );
 }

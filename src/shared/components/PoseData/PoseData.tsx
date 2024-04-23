@@ -1,21 +1,23 @@
-import { cn } from "@/util/cn";
 import React from "react";
-import ScoreCircle from "../ScoreCircle/ScoreCircle";
+import PoseScore from "../PoseScore/PoseScore";
+import DetecedPose from "../DetectedPose/DetecedPose";
+import { cn } from "@/util/cn";
 
 interface PoseDataProps {
-  score: number;
+  poseScore: number;
+  detectedPose: string | undefined;
   className?: string;
 }
 
-export default function PoseData({ score, className }: PoseDataProps) {
+export default function PoseData({
+  poseScore,
+  detectedPose,
+  className,
+}: PoseDataProps) {
   return (
-    <div
-      className={cn(
-        " bg-slate-500 bg-opacity-55 rounded-b-4xl flex justify-center items-center",
-        className
-      )}
-    >
-      <ScoreCircle score={score} />
+    <div className={cn("flex flex-col gap-2 w-96", className)}>
+      <DetecedPose pose={detectedPose} />
+      <PoseScore value={detectedPose ? poseScore : 0} />
     </div>
   );
 }
