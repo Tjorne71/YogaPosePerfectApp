@@ -20,7 +20,7 @@ export default function PoseScore({ value, className }: PoseScoreProps) {
     >
       <CircularProgressbar
         value={value}
-        text={`${value}%`}
+        text={`${value}`}
         className="text-primary hidden lg:flex"
         strokeWidth={5}
         styles={buildStyles({
@@ -29,6 +29,7 @@ export default function PoseScore({ value, className }: PoseScoreProps) {
           trailColor: colors.primary?.toString(),
           rotation: 1 / 2 + 1 / 8,
           strokeLinecap: "butt",
+          textSize: 40,
         })}
       />
       <Progress
