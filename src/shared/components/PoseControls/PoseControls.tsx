@@ -29,7 +29,7 @@ export default function PoseControls({
           icon={"QuestionMark"}
           size="lg"
           onClick={onHelperOpen}
-          className=" drop-shadow-md"
+          className="drop-shadow-md hidden xl:flex"
         />
       )}
       <IconButton
