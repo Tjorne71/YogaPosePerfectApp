@@ -12,10 +12,10 @@ import { FullScreen, useFullScreenHandle } from "react-full-screen";
 import WebcamBackground from "@/shared/components/WebcamBackground/WebcamBackground";
 import PoseData from "@/shared/components/PoseData/PoseData";
 import PoseControls from "@/shared/components/PoseControls/PoseControls";
-import YogaPosesHelperModal from "./test/page";
-import { useDisclosure } from "@nextui-org/react";
+import { CircularProgress, useDisclosure } from "@nextui-org/react";
 import AngleSwitch from "@/shared/components/AngleSwitch/AngleSwitch";
 import DebugTable from "@/shared/components/AngleTable/AngleTable";
+import YogaPosesHelperModal from "@/shared/components/YogaPosesHelperModal/YogaPosesHelperModal";
 
 export default function Pose() {
   const {
@@ -126,6 +126,7 @@ export default function Pose() {
   const videoConstraints: MediaTrackConstraints = {
     facingMode: "user",
   };
+
   return (
     <main className="overflow-hidden">
       {!isLandscape && (
