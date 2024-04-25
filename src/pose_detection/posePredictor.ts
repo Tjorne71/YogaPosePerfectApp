@@ -1,8 +1,8 @@
-import * as tmPose from '@teachablemachine/pose';
-import { Camera } from './camera';
+import * as tmPose from "@teachablemachine/pose";
+import { Camera } from "./camera";
 
-const URL = 'https://teachablemachine.withgoogle.com/models/iKZuChygt/';
-// const URL = 'https://teachablemachine.withgoogle.com/models/Mhu-cJulf/';
+// const URL = 'https://teachablemachine.withgoogle.com/models/iKZuChygt/';
+const URL = "https://teachablemachine.withgoogle.com/models/Mhu-cJulf/";
 
 export interface PosePrediction {
   className: string;
@@ -19,14 +19,16 @@ export class PosePredictor {
   }
 
   async init() {
-    const modelURL = URL + 'model.json';
-    const metadataURL = URL + 'metadata.json';
+    const modelURL = URL + "model.json";
+    const metadataURL = URL + "metadata.json";
 
     this.model = await tmPose.load(modelURL, metadataURL);
     this.maxPredictions = this.model.getTotalClasses();
   }
 
-  async predictVideo(video: HTMLVideoElement): Promise<PosePrediction | undefined> {
+  async predictVideo(
+    video: HTMLVideoElement
+  ): Promise<PosePrediction | undefined> {
     let predictions: PosePrediction[] = [];
     if (this.model != null) {
       const { posenetOutput } = await this.model.estimatePose(video);
@@ -35,7 +37,9 @@ export class PosePredictor {
     return this.getHighestProbabilityPose(predictions);
   }
 
-  async predictImage(image: HTMLImageElement): Promise<PosePrediction | undefined> {
+  async predictImage(
+    image: HTMLImageElement
+  ): Promise<PosePrediction | undefined> {
     let predictions: PosePrediction[] = [];
     if (this.model != null) {
       const { posenetOutput } = await this.model.estimatePose(image);
@@ -44,7 +48,9 @@ export class PosePredictor {
     return this.getHighestProbabilityPose(predictions);
   }
 
-  getHighestProbabilityPose(predictions: PosePrediction[]): PosePrediction | undefined {
+  getHighestProbabilityPose(
+    predictions: PosePrediction[]
+  ): PosePrediction | undefined {
     if (predictions.length === 0) return;
     let highestPrediction = predictions[0];
     for (const prediction of predictions) {
@@ -60,8 +66,8 @@ export class PosePredictor {
 }
 
 const mapRawClassNameToClassName: { [key: string]: string } = {
-  'Downward-Facing Do...': 'Downward-Facing Dog',
-  'Four-Limbed Staff': 'Four-Limbed Staff',
-  'Tree Pose': 'Tree Pose',
-  'Warrior 2': 'Warrior 2',
+  "Downward-Facing Do...": "Downward-Facing Dog",
+  "Four-Limbed Staff": "Four-Limbed Staff",
+  "Tree Pose": "Tree Pose",
+  "Warrior 2": "Warrior 2",
 };

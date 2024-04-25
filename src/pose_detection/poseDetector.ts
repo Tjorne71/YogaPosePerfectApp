@@ -15,29 +15,28 @@
  * =============================================================================
  */
 
-import '@tensorflow/tfjs-backend-webgl';
-import '@tensorflow/tfjs-backend-webgpu';
+import "@tensorflow/tfjs-backend-webgl";
+import "@tensorflow/tfjs-backend-webgpu";
 
-import * as mpPose from '@mediapipe/pose';
-import * as tfjsWasm from '@tensorflow/tfjs-backend-wasm';
-import * as tf from '@tensorflow/tfjs-core';
-import { Keypoint as PoseNetKeypoint } from '@tensorflow-models/posenet';
+import * as mpPose from "@mediapipe/pose";
+import * as tfjsWasm from "@tensorflow/tfjs-backend-wasm";
+import * as tf from "@tensorflow/tfjs-core";
+import { Keypoint as PoseNetKeypoint } from "@tensorflow-models/posenet";
 
-tfjsWasm.setWasmPaths(`https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm@${tfjsWasm.version_wasm}/dist/`);
+tfjsWasm.setWasmPaths(
+  `https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm@${tfjsWasm.version_wasm}/dist/`
+);
 
-import * as posedetection from '@tensorflow-models/pose-detection';
+import * as posedetection from "@tensorflow-models/pose-detection";
 
-import { Camera } from './camera';
-import * as params from './params';
-import { Pose } from '@tensorflow-models/pose-detection';
+import { Camera } from "./camera";
+import { Pose } from "@tensorflow-models/pose-detection";
 
 export class PoseDetector {
   _detector: posedetection.PoseDetector | undefined;
   _camera: Camera | undefined;
 
   async init(webcamStream: MediaStream) {
-    params.STATE.model = posedetection.SupportedModels.BlazePose;
-
     this._camera = await Camera.setup(webcamStream);
 
     await tf.ready();
@@ -45,11 +44,14 @@ export class PoseDetector {
   }
 
   createDetector() {
-    return posedetection.createDetector(posedetection.SupportedModels.BlazePose, {
-      runtime: 'mediapipe',
-      modelType: 'lite',
-      solutionPath: `https://cdn.jsdelivr.net/npm/@mediapipe/pose@${mpPose.VERSION}`,
-    });
+    return posedetection.createDetector(
+      posedetection.SupportedModels.BlazePose,
+      {
+        runtime: "mediapipe",
+        modelType: "lite",
+        solutionPath: `https://cdn.jsdelivr.net/npm/@mediapipe/pose@${mpPose.VERSION}`,
+      }
+    );
   }
 
   async renderResult(): Promise<posedetection.Pose[]> {
@@ -84,7 +86,7 @@ export class PoseDetector {
   }
 
   async renderPrediction() {
-    console.log('started');
+    console.log("started");
     await this.renderResult();
     requestAnimationFrame(this.renderPrediction);
   }
